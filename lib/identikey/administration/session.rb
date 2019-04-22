@@ -12,8 +12,6 @@ module Identikey
         @username = username
         @password = password
         @domain   = domain
-
-        logon
       end
 
       def logon
@@ -25,12 +23,12 @@ module Identikey
 
         @privileges = parse_privileges sess['CREDFLD_LOGICAL_ADMIN_PRIVILEGES']
 
-        @session_id = sess['CREDFLD_SESSION_ID']
-        @location   = sess['CREDFLD_USER_LOCATION']
-        @last_logon = sess['CREDFLD_LAST_LOGON_TIME']
+        @session_id = sess['CREDFLD_SESSION_ID'].freeze
+        @location   = sess['CREDFLD_USER_LOCATION'].freeze
+        @last_logon = sess['CREDFLD_LAST_LOGON_TIME'].freeze
 
-        @product    = sess['CREDFLD_PRODUCT_NAME']
-        @version    = sess['CREDFLD_PRODUCT_VERSION']
+        @product    = sess['CREDFLD_PRODUCT_NAME'].freeze
+        @version    = sess['CREDFLD_PRODUCT_VERSION'].freeze
 
         self
       end
@@ -38,10 +36,10 @@ module Identikey
       def logoff
         require_logged_on!
 
-        stat, _ = @client.logoff session_id: @session_id
+        stat, _, error = @client.logoff session_id: @session_id
 
-        unless stat == 'STAT_ADMIN_SESSION_STOPPED'
-          raise Identikey::Error, "logoff failed: #{stat}"
+        unless stat == 'STAT_ADMIN_SESSION_STOPPED' || stat == 'STAT_SUCCESS'
+          raise Identikey::Error, "logoff failed: #{stat} - #{error}"
         end
 
         @privileges = nil
@@ -50,11 +48,11 @@ module Identikey
         @version    = nil
         @last_logon = nil
 
-        stat
+        stat == 'STAT_SUCCESS'
       end
 
       def alive?
-        require_logged_on!
+        return false unless logged_on?
 
         stat, _ = @client.sessionalive session_id: @session_id
 
@@ -87,7 +85,7 @@ module Identikey
         privileges.split(', ').inject({}) do |h, priv|
           privilege, status = priv.split(' ')
           h.update(privilege => status == 'true')
-        end
+        end.freeze
       end
     end
 

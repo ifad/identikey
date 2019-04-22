@@ -1,6 +1,13 @@
 require 'identikey/administration/session'
+require 'identikey/administration/session_query'
 
 module Identikey
+  # This class wraps the Administration API wsdl, that contains dozens of
+  # methods. It is currently monolithic.
+  #
+  # It's the lower level into the Administration API, while its models are
+  # wrapped in separate clasess.
+  #
   class Administration
     extend Savon::Model
 
