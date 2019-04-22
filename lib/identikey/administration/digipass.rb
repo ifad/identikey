@@ -77,6 +77,19 @@ module Identikey
         replace(digipass)
       end
 
+      def test_otp(otp)
+        stat, appl, error = @session.execute(
+          :digipassappl_execute_TEST_OTP, serial_no: self.serial, appl: self.application, otp: otp)
+
+        # Stat is useless here - it reports whether the call or not has
+        # succeeded, not whether the OTP is valid
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::Error, "Test OTP failed: #{stat} - #{error}"
+        end
+
+        appl['DIGIPASSAPPLFLD_RESULT_CODE'] == '0'
+      end
+
       def method_missing(name, *args, &block)
         if @attributes.key?(name)
           @attributes.fetch(name)
