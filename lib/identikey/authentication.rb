@@ -2,16 +2,7 @@ require 'identikey/base'
 
 module Identikey
   class Authentication < Base
-    client wsdl: './sdk/wsdl/authentication.wsdl',
-      endpoint: 'https://localhost:8888/',
-      ssl_version: :TLSv1_2,
-
-      headers: {'User-Agent' => "ruby/identikey #{Identikey::VERSION}"},
-      encoding: 'UTF-8',
-
-      logger: Logger.new('log/soap-authentication.log'),
-      log_level: :debug,
-      pretty_print_xml: true
+    client wsdl: './sdk/wsdl/authentication.wsdl'
 
     operations :auth_user
 

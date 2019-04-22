@@ -10,16 +10,7 @@ module Identikey
   # wrapped in separate clasess.
   #
   class Administration < Base
-    client wsdl: './sdk/wsdl/administration.wsdl',
-      endpoint: 'https://localhost:8888/',
-      ssl_version: :TLSv1_2,
-
-      headers: {'User-Agent' => "ruby/identikey #{Identikey::VERSION}"},
-      encoding: 'UTF-8',
-
-      logger: Logger.new('log/soap-administration.log'),
-      log_level: :debug,
-      pretty_print_xml: true
+    client wsdl: './sdk/wsdl/administration.wsdl'
 
     operations :logon, :logoff, :sessionalive,
       :admin_session_query, :digipass_execute, :digipassappl_execute
