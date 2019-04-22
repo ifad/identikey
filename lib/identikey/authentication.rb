@@ -48,13 +48,13 @@ module Identikey
       parse_response resp, :auth_user_response
     end
 
-    def valid_otp?(user, otp)
-      status, _ = auth_user(user, otp)
+    def self.valid_otp?(user, otp)
+      status, _ = new.auth_user(user, otp)
       return status == 'STAT_SUCCESS'
     end
 
-    def validate!(user, otp)
-      status, result, _ = auth_user(user, otp)
+    def self.validate!(user, otp)
+      status, result, _ = new.auth_user(user, otp)
       if status == 'STAT_SUCCESS'
         return true
       else
