@@ -4,31 +4,33 @@ module Identikey
     class Session
       attr_reader :username, :password, :domain
       attr_reader :session_id, :product, :version
-      attr_reader :privileges
+      attr_reader :privileges, :location
 
       def initialize(username:, password:, domain: 'master')
         @client = Identikey::Administration.new
 
-        logon(username: username, password: password, domain: domain)
+        @username = username
+        @password = password
+        @domain   = domain
+
+        logon
       end
 
-      def logon(username: @username, password: @password, domain: @domain)
-        stat, resp = @client.logon(username: username, password: password, domain: domain)
+      def logon
+        stat, sess, error = @client.logon(username: @username, password: @password, domain: @domain)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "logon failed: #{stat}"
+          raise Identikey::Error, "logon failed: #{stat} - #{error}"
         end
 
-        @privileges = parse_privileges resp['CREDFLD_LOGICAL_ADMIN_PRIVILEGES']
+        @privileges = parse_privileges sess['CREDFLD_LOGICAL_ADMIN_PRIVILEGES']
 
-        @session_id = resp['CREDFLD_SESSION_ID']
-        @username   = resp['CREDFLD_USERID']
-        @password   = resp['CREDFLD_STATIC_PASSWORD']
-        @domain     = resp['CREDFLD_DOMAIN']
+        @session_id = sess['CREDFLD_SESSION_ID']
+        @location   = sess['CREDFLD_USER_LOCATION']
+        @last_logon = sess['CREDFLD_LAST_LOGON_TIME']
 
-        @product    = resp['CREDFLD_PRODUCT_NAME']
-        @version    = resp['CREDFLD_PRODUCT_VERSION']
-        @last_logon = resp['CREDFLD_LAST_LOGON_TIME']
+        @product    = sess['CREDFLD_PRODUCT_NAME']
+        @version    = sess['CREDFLD_PRODUCT_VERSION']
 
         self
       end
