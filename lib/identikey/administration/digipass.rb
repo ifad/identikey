@@ -1,5 +1,5 @@
 module Identikey
-  class Administration
+  class Administration < Base
 
     class Digipass
       def self.find(session_id:, serial_no:)

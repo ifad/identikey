@@ -1,5 +1,5 @@
 module Identikey
-  class Administration
+  class Administration < Base
 
     class Session
       attr_reader :username, :password, :domain

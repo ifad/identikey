@@ -1,5 +1,5 @@
 module Identikey
-  class Administration
+  class Administration < Base
 
     class SessionQuery
       def self.all(session_id:)

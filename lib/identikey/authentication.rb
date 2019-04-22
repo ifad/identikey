@@ -1,7 +1,7 @@
-module Identikey
-  class Authentication
-    extend Savon::Model
+require 'identikey/base'
 
+module Identikey
+  class Authentication < Base
     client wsdl: './sdk/wsdl/authentication.wsdl',
       endpoint: 'https://localhost:8888/',
       ssl_version: :TLSv1_2,
@@ -13,8 +13,10 @@ module Identikey
       log_level: :debug,
       pretty_print_xml: true
 
+    operations :auth_user
+
     def auth_user(user, otp, domain: 'root')
-      client.call(:auth_user, message: {
+      resp = super(message: {
         credentialAttributeSet: {
           attributes: [
             { attributeID: 'CREDFLD_COMPONENT_TYPE',
@@ -42,6 +44,23 @@ module Identikey
           ]
         }
       })
+
+      parse_response resp, :auth_user_response
+    end
+
+    def valid_otp?(user, otp)
+      status, _ = auth_user(user, otp)
+      return status == 'STAT_SUCCESS'
+    end
+
+    def validate!(user, otp)
+      status, result, _ = auth_user(user, otp)
+      if status == 'STAT_SUCCESS'
+        return true
+      else
+        error_message = result['CREDFLD_STATUS_MESSAGE']
+        raise Identikey::Error, "OTP Validation error (#{status}): #{error_message}"
+      end
     end
   end
 end
