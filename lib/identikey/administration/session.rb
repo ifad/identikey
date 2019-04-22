@@ -59,6 +59,12 @@ module Identikey
         stat == 'STAT_SUCCESS'
       end
 
+      def all
+        require_logged_on!
+
+        SessionQuery.all session_id: @session_id
+      end
+
       def inspect
         "#<#{self.class.name} sid=#@session_id username=#@username domain=#@domain product=#@product>"
       end

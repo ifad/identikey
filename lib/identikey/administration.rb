@@ -15,7 +15,7 @@ module Identikey
       log_level: :debug,
       pretty_print_xml: true
 
-    operations :logon, :logoff, :sessionalive
+    operations :logon, :logoff, :sessionalive, :admin_session_query
 
     def logon(username:, password:, domain: 'master')
       resp = super(message: {
@@ -72,6 +72,37 @@ module Identikey
       parse_response resp, :sessionalive_response
     end
 
+    def admin_session_query(session_id:)
+      attributes = [ ]
+
+      # These doesn't seem to work as described by the WSDL.
+      # if q_idx
+      #   attributes.push(attributeID: 'ADMINSESSIONFLD_SESSION_IDX',
+      #                   value: { '@xsi:type': 'xsd:string', content!: q_idx})
+      # end
+
+      # if q_location
+      #   attributes.push(attributeID: 'ADMINSESSIONFLD_LOCATION',
+      #                   value: { '@xsi:type': 'xsd:string', content!: q_location})
+      # end
+
+      # if q_username
+      #   attributes.push(attributeID: 'ADMINSESSIONFLD_LOGIN_NAME',
+      #                   value: { '@xsi:type': 'xsd:string', content!: q_username})
+      # end
+
+      resp = super(message: {
+        sessionID: session_id,
+        attributeSet: {
+          attributes: attributes
+        }
+        # fieldSet: { ... }
+        # queryOptions: { ... }
+      })
+
+      parse_response resp, :admin_session_query_response
+    end
+
     def parse_response(resp, root_element)
       body = resp.body
 
@@ -99,15 +130,41 @@ module Identikey
         raise Identikey::Error, "Result attribute not found below #{root_element}"
       end
 
-      result_attributes = if (attrs = results[:result_attribute].key?(:attributes))
-        results[:result_attribute][:attributes].inject({}) do |h, attribute|
-          h.update(attribute.fetch(:attribute_id) => attribute.fetch(:value))
+      results_attr = results[:result_attribute]
+
+      result_attributes = if results_attr.key?(:attributes)
+        parse_attributes results_attr[:attributes]
+
+      elsif results_attr.key?(:attribute_list)
+        results_attr[:attribute_list].inject([]) do |a, entry|
+          a.push parse_attributes(entry[:attributes])
         end
       else
-        {}
+        nil
       end
 
-      return result_code, result_attributes
+      errors = if results[:error_stack].key?(:errors)
+        parse_errors results[:error_stack][:errors]
+      else
+        nil
+      end
+
+      return result_code, result_attributes, errors
+    end
+
+    def parse_attributes(attributes)
+      attributes.inject({}) do |h, attribute|
+        h.update(attribute.fetch(:attribute_id) => attribute.fetch(:value))
+      end
+    end
+
+    def parse_errors(errors)
+      case errors
+      when Array
+        errors.map { |e| e.fetch(:error_desc) }
+      when Hash
+        errors.fetch(:error_desc)
+      end
     end
   end
 end
