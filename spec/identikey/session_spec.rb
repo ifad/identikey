@@ -1,7 +1,7 @@
 RSpec.describe Identikey::Administration::Session do
-  let(:username) { ENV['TEST_USERNAME'] || 'ruby' }
-  let(:password) { ENV['TEST_PASSWORD'] || 'fake' }
-  let(:domain)   { ENV['TEST_DOMAIN']   || 'master' }
+  let(:username) { ENV.fetch('TEST_USERNAME') }
+  let(:password) { ENV.fetch('TEST_PASSWORD') }
+  let(:domain)   { ENV.fetch('TEST_DOMAIN', 'master') }
 
   let(:session) { described_class.new username: username, password: password, domain: domain }
 
