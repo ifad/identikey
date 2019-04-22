@@ -29,19 +29,19 @@ module Identikey
         attributeSet: {
           attributes: [
             { attributeID: 'CREDFLD_DOMAIN',
-              value: { :'@xsi:type' => 'xsd:string', :content! => domain.to_s }
+              value: { '@xsi:type': 'xsd:string', content!: domain.to_s }
             },
 
             { attributeID: 'CREDFLD_PASSWORD',
-              value: { :'@xsi:type' => 'xsd:string', :content! => password.to_s }
+              value: { '@xsi:type': 'xsd:string', content!: password.to_s }
             },
 
             { attributeID: 'CREDFLD_USERID',
-              value: { :'@xsi:type' => 'xsd:string', :content! => username.to_s }
+              value: { '@xsi:type': 'xsd:string', content!: username.to_s }
             },
 
             { attributeID: 'CREDFLD_PASSWORD_FORMAT',
-              value: { :'@xsi:type' => 'xsd:unsignedInt', :content! => 0
+              value: { '@xsi:type': 'xsd:unsignedInt', content!: 0
               }
             }
           ]
@@ -56,7 +56,7 @@ module Identikey
         attributeSet: {
           attributes: [
             { attributeID: 'CREDFLD_SESSION_ID',
-              value: { :'@xsi:type' => 'xsd:string', :content! => session_id.to_s }
+              value: { '@xsi:type': 'xsd:string', content!: session_id.to_s }
             }
           ]
         }
@@ -70,7 +70,7 @@ module Identikey
         attributeSet: {
           attributes: [
             { attributeID: 'CREDFLD_SESSION_ID',
-              value: { :'@xsi:type' => 'xsd:string', :content! => session_id.to_s }
+              value: { '@xsi:type': 'xsd:string', content!: session_id.to_s }
             }
           ]
         }
