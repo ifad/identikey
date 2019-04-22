@@ -22,7 +22,7 @@ module Identikey
       log_level: :debug,
       pretty_print_xml: true
 
-    operations :logon, :logoff, :sessionalive, :admin_session_query
+    operations :logon, :logoff, :sessionalive, :admin_session_query, :digipass_execute
 
     def logon(username:, password:, domain: 'master')
       resp = super(message: {
@@ -108,6 +108,29 @@ module Identikey
       })
 
       parse_response resp, :admin_session_query_response
+    end
+
+    def digipass_execute(session_id:, cmd:, attributes: [])
+      resp = super(message: {
+        sessionID: session_id,
+        cmd: cmd,
+        attributeSet: {
+          attributes: attributes
+        }
+      })
+
+      parse_response resp, :digipass_execute_response
+    end
+
+    def digipass_execute_VIEW(session_id:, serial_no:)
+      digipass_execute(
+        session_id: session_id,
+        cmd: 'DIGIPASSCMD_VIEW',
+        attributes: [
+          { attributeID: 'DIGIPASSFLD_SERNO',
+            value: { '@xsi:type': 'xsd:string', content!: serial_no } }
+        ]
+      )
     end
 
     # Parse the generic response types that the API returns.
