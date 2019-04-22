@@ -2,18 +2,18 @@ module Identikey
   class Administration < Base
 
     class Digipass
-      def self.find(session_id:, serial_no:)
-        client = Identikey::Administration.new
+      def self.find(session:, serial_no:)
+        new(session).find(serial_no)
+      end
 
-        stat, digipass, error =
-          client.digipass_execute_VIEW(
-            session_id: session_id, serial_no: serial_no)
+      def initialize(session, digipass = nil)
+        @session = session
 
-        if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "Find digipass failed: #{stat} - #{error}"
-        end
+        replace(digipass) if digipass
+      end
 
-        new(
+      def replace(digipass)
+        @attributes = {
           serial:             digipass['DIGIPASSFLD_SERNO'],
           domain:             digipass['DIGIPASSFLD_DOMAIN'],
           ou:                 digipass['DIGIPASSFLD_ORGANIZATIONAL_UNIT'],
@@ -31,11 +31,50 @@ module Identikey
           max_activations:    digipass['DIGIPASSFLD_MAX_ACTIVATIONS'],
           expired:            digipass['DIGIPASSFLD_EXPIRED'],
           grace_expired:      digipass['DIGIPASSFLD_GRACE_PERIOD_EXPIRED']
-        )
+        }.freeze
+
+        self
       end
 
-      def initialize(attributes)
-        @attributes = attributes.freeze
+      def assigned?
+        self.status == 'Assigned'
+      end
+
+      def find(serial_no)
+        stat, digipass, error = @session.execute(
+          :digipass_execute_VIEW, serial_no: serial_no)
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::Error, "Find digipass failed: #{stat} - #{error}"
+        end
+
+        replace(digipass)
+      end
+
+      def reload
+        find(self.serial)
+      end
+
+      def unassign!
+        stat, digipass, error = @session.execute(
+          :digipass_execute_UNASSIGN, serial_no: self.serial)
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::Error, "Assign digipass failed: #{stat} - #{error}"
+        end
+
+        replace(digipass)
+      end
+
+      def assign!(username)
+        stat, digipass, error = @session.execute(
+          :digipass_execute_ASSIGN, serial_no: self.serial, username: username)
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::Error, "Unassign digipass failed: #{stat} - #{error}"
+        end
+
+        replace(digipass)
       end
 
       def method_missing(name, *args, &block)

@@ -26,9 +26,9 @@ RSpec.describe Identikey::Administration::SessionQuery do
   end
 
   context 'on a stale session' do
-    let!(:sid) { @s1.sid }
+    let(:stale) { @s1.dup }
     before { @s1.logoff }
-    subject { described_class.all session_id: sid }
+    subject { described_class.all session: stale }
     it { expect { subject }.to raise_error(Identikey::Error, /query failed: STAT_ADMIN_SESSION_STOPPED/) }
   end
 end

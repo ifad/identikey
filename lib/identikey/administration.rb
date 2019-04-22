@@ -1,6 +1,7 @@
 require 'identikey/base'
 require 'identikey/administration/session'
 require 'identikey/administration/session_query'
+require 'identikey/administration/digipass'
 
 module Identikey
   # This class wraps the Administration API wsdl, that contains dozens of

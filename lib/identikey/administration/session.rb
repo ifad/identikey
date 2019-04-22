@@ -59,10 +59,22 @@ module Identikey
         stat == 'STAT_SUCCESS'
       end
 
+      def execute(command, *args)
+        kwargs = args.first || {}
+        kwargs.update(session_id: @session_id)
+        @client.public_send(command, kwargs)
+      end
+
       def all
         require_logged_on!
 
-        SessionQuery.all session_id: @session_id
+        SessionQuery.all session: self
+      end
+
+      def find_digipass(serial_no)
+        require_logged_on!
+
+        Digipass.find session: self, serial_no: serial_no
       end
 
       def inspect

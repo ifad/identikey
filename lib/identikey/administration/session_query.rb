@@ -2,22 +2,20 @@ module Identikey
   class Administration < Base
 
     class SessionQuery
-      def self.all(session_id:)
-        client = Identikey::Administration.new
-
-        stat, sessions, error = client.admin_session_query(session_id: session_id)
+      def self.all(session:)
+        stat, sessions, error = session.execute(:admin_session_query)
 
         if stat != 'STAT_SUCCESS'
           raise Identikey::Error, "query failed: #{stat} - #{error}"
         end
 
-        sessions.map do |session|
+        sessions.map do |sess|
           new(
-            idx:        session['ADMINSESSIONFLD_SESSION_IDX'],
-            username:   session['ADMINSESSIONFLD_LOGIN_NAME'],
-            domain:     session['ADMINSESSIONFLD_DOMAIN'],
-            location:   session['ADMINSESSIONFLD_LOCATION'],
-            start_time: session['ADMINSESSIONFLD_START_TIME']
+            idx:        sess['ADMINSESSIONFLD_SESSION_IDX'],
+            username:   sess['ADMINSESSIONFLD_LOGIN_NAME'],
+            domain:     sess['ADMINSESSIONFLD_DOMAIN'],
+            location:   sess['ADMINSESSIONFLD_LOCATION'],
+            start_time: sess['ADMINSESSIONFLD_START_TIME']
           )
         end
       end
