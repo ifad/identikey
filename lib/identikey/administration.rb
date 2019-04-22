@@ -103,6 +103,39 @@ module Identikey
       parse_response resp, :admin_session_query_response
     end
 
+    # Parse the generic response types that the API returns.
+    #
+    # The returned attributes (up to now...) are always:
+    #
+    # - The given root element, whose name is derived from the SOAP command
+    #   that was invoked
+    # - The :results element, containing:
+    #   - :result_codes, containing :status_code_enum that is the operation
+    #     result code
+    #   - :result_attribute, that may either contain a single attributes list
+    #      or multiple ones.
+    #   - :error_stack, a list of error that occurred
+    #
+    # The returned value is a three-elements array, containing:
+    #
+    #   [Response code, Attribute(s) list, Errors list]
+    #
+    # The response code is a string from the IDENTIKEY Authentication Server
+    # Error Codes table.
+    #
+    # The attributes list is an Hash when a single object's attributes were
+    # requested, or is an Array of Hashes when the response contains a list
+    # of objects.
+    #
+    # The attributes list may be nil.
+    #
+    # The errors list is an array of strings containing error descriptions.
+    # The strings themselves contain the error code, albeit in different
+    # formats. TODO maybe create a separate class for errors, that includes
+    # the error code.
+    #
+    # TODO refactor and split in separate methods
+    #
     def parse_response(resp, root_element)
       body = resp.body
 
@@ -114,18 +147,24 @@ module Identikey
         raise Identikey::Error, "Expected response to have #{root_element}, found #{body.keys.join(', ')}"
       end
 
+      # The results element
+      #
       unless body[root_element].key?(:results)
         raise Identikey::Error, "Results element not found below #{root_element}"
       end
 
       results = body[root_element][:results]
 
+      # Result code
+      #
       unless results.key?(:result_codes)
         raise Identikey::Error, "Result codes not found below #{root_element}"
       end
 
       result_code = results[:result_codes][:status_code_enum] || 'STAT_UNKNOWN'
 
+      # Result attributes
+      #
       unless results.key?(:result_attribute)
         raise Identikey::Error, "Result attribute not found below #{root_element}"
       end
@@ -143,6 +182,8 @@ module Identikey
         nil
       end
 
+      # Errors
+      #
       errors = if results[:error_stack].key?(:errors)
         parse_errors results[:error_stack][:errors]
       else
