@@ -175,7 +175,12 @@ module Identikey
         parse_attributes results_attr[:attributes]
 
       elsif results_attr.key?(:attribute_list)
-        results_attr[:attribute_list].inject([]) do |a, entry|
+        # This attribute may contain a single entry or multiple ones. Lists of
+        # a single element are returned as a single attributes set.. but the
+        # caller expects a list so we return the single element in an Array.
+        #
+        entries = [ results_attr[:attribute_list] ].flatten
+        entries.inject([]) do |a, entry|
           a.push parse_attributes(entry[:attributes])
         end
       else
