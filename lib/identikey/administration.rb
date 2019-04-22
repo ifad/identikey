@@ -1,3 +1,5 @@
+require 'identikey/administration/session'
+
 module Identikey
   class Administration
     extend Savon::Model
