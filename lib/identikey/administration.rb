@@ -133,6 +133,34 @@ module Identikey
       )
     end
 
+    def digipass_execute_UNASSIGN(session_id:, serial_no:)
+      digipass_execute(
+        session_id: session_id,
+        cmd: 'DIGIPASSCMD_UNASSIGN',
+        attributes: [
+          { attributeID: 'DIGIPASSFLD_SERNO',
+            value: { '@xsi:type': 'xsd:string', content!: serial_no } }
+        ]
+      )
+    end
+
+    def digipass_execute_ASSIGN(session_id:, serial_no:, username:, domain: 'root', grace_period: 0)
+      digipass_execute(
+        session_id: session_id,
+        cmd: 'DIGIPASSCMD_ASSIGN',
+        attributes: [
+          { attributeID: 'DIGIPASSFLD_SERNO',
+            value: { '@xsi:type': 'xsd:string', content!: serial_no } },
+          { attributeID: 'DIGIPASSFLD_ASSIGNED_USERID',
+            value: { '@xsi:type': 'xsd:string', content!: username } },
+          { attributeID: 'DIGIPASSFLD_DOMAIN',
+            value: { '@xsi:type': 'xsd:string', content!: domain } },
+          { attributeID: 'DIGIPASSFLD_GRACE_PERIOD_DAYS',
+            value: { '@xsi:type': 'xsd:int', content!: grace_period } }
+        ]
+      )
+    end
+
     def digipassappl_execute(session_id:, cmd:, attributes:)
       resp = super(message: {
         sessionID: session_id,
