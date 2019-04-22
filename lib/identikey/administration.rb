@@ -15,7 +15,7 @@ module Identikey
       log_level: :debug,
       pretty_print_xml: true
 
-    operations :logon, :logoff
+    operations :logon, :logoff, :sessionalive
 
     def logon(username:, password:, domain: 'master')
       resp = super(message: {
@@ -49,13 +49,27 @@ module Identikey
         attributeSet: {
           attributes: [
             { attributeID: 'CREDFLD_SESSION_ID',
-              value: { :'@xsi:type' => 'xsd:string', :content! => sid.to_s }
+              value: { :'@xsi:type' => 'xsd:string', :content! => session_id.to_s }
             }
           ]
         }
       })
 
       parse_response resp, :logoff_response
+    end
+
+    def sessionalive(session_id:)
+      resp = super(message: {
+        attributeSet: {
+          attributes: [
+            { attributeID: 'CREDFLD_SESSION_ID',
+              value: { :'@xsi:type' => 'xsd:string', :content! => session_id.to_s }
+            }
+          ]
+        }
+      })
+
+      parse_response resp, :sessionalive_response
     end
 
     def parse_response(resp, root_element)

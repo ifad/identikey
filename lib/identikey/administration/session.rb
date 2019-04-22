@@ -34,9 +34,7 @@ module Identikey
       end
 
       def logoff
-        if @session_id.nil?
-          raise Identikey::Error, "Session is not logged on at the moment"
-        end
+        require_logged_on!
 
         stat, _ = @client.logoff session_id: @session_id
 
@@ -53,6 +51,14 @@ module Identikey
         stat
       end
 
+      def alive?
+        require_logged_on!
+
+        stat, _ = @client.sessionalive session_id: @session_id
+
+        stat == 'STAT_SUCCESS'
+      end
+
       def inspect
         "#<#{self.class.name} sid=#@session_id username=#@username domain=#@domain product=#@product>"
       end
@@ -61,6 +67,12 @@ module Identikey
 
       def logged_on?
         !@session_id.nil?
+      end
+
+      def require_logged_on!
+        unless logged_on?
+          raise Identikey::Error, "Session is not logged on at the moment"
+        end
       end
 
       def parse_privileges(privileges)
