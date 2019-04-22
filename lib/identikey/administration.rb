@@ -21,7 +21,8 @@ module Identikey
       log_level: :debug,
       pretty_print_xml: true
 
-    operations :logon, :logoff, :sessionalive, :admin_session_query, :digipass_execute
+    operations :logon, :logoff, :sessionalive,
+      :admin_session_query, :digipass_execute, :digipassappl_execute
 
     def logon(username:, password:, domain: 'master')
       resp = super(message: {
@@ -128,6 +129,33 @@ module Identikey
         attributes: [
           { attributeID: 'DIGIPASSFLD_SERNO',
             value: { '@xsi:type': 'xsd:string', content!: serial_no } }
+        ]
+      )
+    end
+
+    def digipassappl_execute(session_id:, cmd:, attributes:)
+      resp = super(message: {
+        sessionID: session_id,
+        cmd: cmd,
+        attributeSet: {
+          attributes: attributes
+        }
+      })
+
+      parse_response resp, :digipassappl_execute_response
+    end
+
+    def digipassappl_execute_TEST_OTP(session_id:, serial_no:, appl:, otp:)
+      digipassappl_execute(
+        session_id: session_id,
+        cmd: 'DIGIPASSAPPLCMD_TEST_OTP',
+        attributes: [
+          { attributeID: 'DIGIPASSAPPLFLD_SERNO',
+            value: { '@xsi:type': 'xsd:string', content!: serial_no } },
+          { attributeID: 'DIGIPASSAPPLFLD_APPL_NAME',
+            value: { '@xsi:type': 'xsd:string', content!: appl } },
+          { attributeID: 'DIGIPASSAPPLFLD_RESPONSE',
+            value: { '@xsi:type': 'xsd:string', content!: otp } }
         ]
       )
     end
