@@ -3,13 +3,18 @@ module Identikey
   class Base
     extend Savon::Model
 
+    def self.configure(&block)
+      self.client.globals.instance_eval(&block)
+    end
+
     def self.client(options)
       defaults = {
         endpoint: 'https://localhost:8888/',
 
         ssl_version: :TLSv1_2,
+        ssl_verify_mode: :none,
 
-        headers: {'User-Agent' => "ruby/identikey #{Identikey::VERSION}"},
+        headers: default_user_agent_header,
 
         encoding: 'UTF-8',
 
@@ -19,6 +24,10 @@ module Identikey
       }
 
       super defaults.merge(options)
+    end
+
+    def self.default_user_agent_header
+      {'User-Agent' => "ruby/identikey #{Identikey::VERSION}"}
     end
 
     protected

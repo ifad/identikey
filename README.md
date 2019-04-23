@@ -25,6 +25,41 @@ And then execute:
 
     $ bundle
 
+## Configuration
+
+By default the client expects WSDL files in the current working directory,
+into `./sdk/wsdl` and it connects to an Identikey API endpoint on localhost
+port 8888 using TLSv1.2. Great for development, but definitely not good for
+production.
+
+To configure the client, you should at least define where your WSDL files are
+and where the SOAP endpoint is. Given the WSDL file is different for the two
+API sets (Authentication and Administration), you need to configure the two
+classes separately.
+
+Use the `.configure` method, that will run the block you give to it in the
+context of the [Savon::Globals](http://savonrb.com/version2/globals.html)
+object as such all available configuration parameters are available as
+instance methods.
+
+Example:
+
+```ruby
+Identikey::Authentication.configure do
+  wsdl     './path/to/your/authentication.wsdl'
+  endpoint 'https://your-identikey.example.com:8888'
+
+  # ... more configuration options as needed ...
+end
+
+Identikey::Administration.configure do
+  wsdl     './path/to/your/administrtaion.wsdl'
+  endpoint 'https://your-identikey.example.com:8888'
+
+  # ... more configuration options as needed ...
+end
+```
+
 ## Usage
 
 This is still in alpha stage, as such there is not much documentation. Have a
