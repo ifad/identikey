@@ -1,7 +1,7 @@
 RSpec.describe Identikey::Administration::SessionQuery do
-  username = ENV['TEST_USERNAME'] || 'ruby'
-  password = ENV['TEST_PASSWORD'] || 'fake'
-  domain   = ENV['TEST_DOMAIN']   || 'master'
+  username = ENV.fetch('TEST_USERNAME')
+  password = ENV.fetch('TEST_PASSWORD')
+  domain   = ENV.fetch('TEST_DOMAIN', 'master')
 
   session  = Identikey::Administration::Session.new \
     username: username, password: password, domain: domain
