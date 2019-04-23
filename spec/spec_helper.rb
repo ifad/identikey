@@ -19,4 +19,16 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.before :suite do
+    Identikey::Authentication.configure do
+      wsdl     ENV['WSDL_AUTH'] if ENV['WSDL_AUTH']
+      endpoint ENV['HOST']      if ENV['HOST']
+    end
+
+    Identikey::Administration.configure do
+      wsdl     ENV['WSDL_ADMIN'] if ENV['WSDL_ADMIN']
+      endpoint ENV['HOST']       if ENV['HOST']
+    end
+  end
 end
