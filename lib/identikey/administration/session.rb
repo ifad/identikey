@@ -77,6 +77,12 @@ module Identikey
         Digipass.find session: self, serial_no: serial_no
       end
 
+      def find_user(username, domain)
+        require_logged_on!
+
+        User.find session: self, username: username, domain: domain
+      end
+
       def inspect
         "#<#{self.class.name} sid=#@session_id username=#@username domain=#@domain product=#@product>"
       end

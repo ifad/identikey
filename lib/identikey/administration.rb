@@ -2,6 +2,7 @@ require 'identikey/base'
 require 'identikey/administration/session'
 require 'identikey/administration/session_query'
 require 'identikey/administration/digipass'
+require 'identikey/administration/user'
 
 module Identikey
   # This class wraps the Administration API wsdl, that contains dozens of
@@ -14,7 +15,8 @@ module Identikey
     client wsdl: './sdk/wsdl/administration.wsdl'
 
     operations :logon, :logoff, :sessionalive,
-      :admin_session_query, :digipass_execute, :digipassappl_execute
+      :admin_session_query, :user_execute,
+      :digipass_execute, :digipassappl_execute
 
     def logon(username:, password:, domain: 'master')
       resp = super(message: {
@@ -100,6 +102,31 @@ module Identikey
       })
 
       parse_response resp, :admin_session_query_response
+    end
+
+    def user_execute(session_id:, cmd:, attributes: [])
+      resp = super(message: {
+        sessionID: session_id,
+        cmd: cmd,
+        attributeSet: {
+          attributes: attributes
+        }
+      })
+
+      parse_response resp, :user_execute_response
+    end
+
+    def user_execute_VIEW(session_id:, username:, domain: 'root')
+      user_execute(
+        session_id: session_id,
+        cmd: 'USERCMD_VIEW',
+        attributes: [
+          { attributeID: 'USERFLD_USERID',
+            value: { '@xsi:type': 'xsd:string', content!: username } },
+          { attributeID: 'USERFLD_DOMAIN',
+            value: { '@xsi:type': 'xsd:string', content!: domain } }
+        ]
+      )
     end
 
     def digipass_execute(session_id:, cmd:, attributes: [])
