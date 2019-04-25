@@ -5,9 +5,16 @@ module Identikey
 
     def self.configure(&block)
       self.client.globals.instance_eval(&block)
+
+      # Work around a sillyness in Savon
+      if client.globals[:wsdl] != client.wsdl.document
+        client.wsdl.document = client.globals[:wsdl]
+      end
     end
 
-    def self.client(options)
+    def self.client(options = nil)
+      return super() unless options
+
       defaults = {
         endpoint: 'https://localhost:8888/',
 
