@@ -20,6 +20,18 @@ RSpec.describe Identikey::Administration::Session do
     end
   end
 
+  describe '#endpoint' do
+    subject { session.endpoint }
+
+    it { expect(subject).to eq(ENV['TEST_HOST']) }
+  end
+
+  describe '#wsdl' do
+    subject { session.wsdl }
+
+    it { expect(subject).to eq(ENV['WSDL_ADMIN'] || './sdk/wsdl/administration.wsdl') }
+  end
+
   describe '#logon' do
     subject { session.logon }
 

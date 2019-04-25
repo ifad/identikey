@@ -14,6 +14,14 @@ module Identikey
         @domain   = domain
       end
 
+      def endpoint
+        @client.endpoint
+      end
+
+      def wsdl
+        @client.wsdl
+      end
+
       def logon
         stat, sess, error = @client.logon(username: @username, password: @password, domain: @domain)
 

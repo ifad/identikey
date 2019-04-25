@@ -37,6 +37,14 @@ module Identikey
       {'User-Agent' => "ruby/identikey #{Identikey::VERSION}"}
     end
 
+    def endpoint
+      self.class.client.globals[:endpoint]
+    end
+
+    def wsdl
+      self.class.client.globals[:wsdl]
+    end
+
     protected
 
       # Parse the generic response types that the API returns.
