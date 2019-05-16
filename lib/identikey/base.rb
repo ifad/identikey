@@ -203,13 +203,16 @@ module Identikey
           when Symbol, String
             [ 'xsd:string', value.to_s ]
 
+          when NilClass
+            next
+
           else
-            raise Identikey::Error, "Unsupported type #{value.class} [ #{value.inspect} ]"
+            raise Identikey::Error, "#{name} type #{value.class} is unsupported"
           end
 
           { attributeID: name.to_s,
             value: { '@xsi:type': type, content!: value } }
-        end
+        end.compact
       end
 
     # protected
