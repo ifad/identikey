@@ -9,30 +9,13 @@ module Identikey
     def auth_user(user, domain, otp)
       resp = super(message: {
         credentialAttributeSet: {
-          attributes: [
-            { attributeID: 'CREDFLD_COMPONENT_TYPE',
-              value: {
-                :'@xsi:type' => 'xsd:string',
-                :content!    => 'Administration Program'
-              }
-            },
-
-            { attributeID: 'CREDFLD_USERID',
-              value: { :'@xsi:type' => 'xsd:string', :content! => user.to_s }
-            },
-
-            { attributeID: 'CREDFLD_DOMAIN',
-              value: { :'@xsi:type' => 'xsd:string', :content! => domain.to_s }
-            },
-
-            { attributeID: 'CREDFLD_PASSWORD_FORMAT',
-              value: { :'@xsi:type' => 'xsd:unsignedInt', :content! => 0 }
-            },
-
-            { attributeID: 'CREDFLD_PASSWORD',
-              value: { :'@xsi:type' => 'xsd:string', :content! => otp.to_s }
-            },
-          ]
+          attributes: typed_attributes_list_from(
+            CREDFLD_COMPONENT_TYPE: 'Administration Program',
+            CREDFLD_USERID: user,
+            CREDFLD_DOMAIN: domain,
+            CREDFLD_PASSWORD_FORMAT: Unsigned(0),
+            CREDFLD_PASSWORD: otp
+          )
         }
       })
 

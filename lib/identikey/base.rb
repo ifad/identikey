@@ -168,6 +168,50 @@ module Identikey
           errors.fetch(:error_desc)
         end
       end
+
+      # Converts and hash keyed by attribute name into an array of hashes
+      # whose keys are the attribute name as attributeID and the value as
+      # a Gyoku-compatible hash with the xsd:type annotation. The type is
+      # inferred from the Ruby value type and the contents are serialized
+      # as a string formatted as per the XSD DTD definition.
+      #
+      # <rant>
+      # This code should not exist, because defining argument types is what
+      # WSDL is for.  However, in the braindead web services implementation
+      # of Vasco there are infinite protocols that accept a variable number
+      # of attributes and their types are defined only in the documentation
+      # and in server code, making WSDL (and SOAP) only an annoynace rather
+      # than an aid.
+      # </rant>
+      #
+      def typed_attributes_list_from(hash)
+        hash.map do |name, value|
+          type, value = case value
+
+          when Unsigned
+            [ 'xsd:unsignedInt', value.to_s ]
+
+          when Integer
+            [ 'xsd:int', value.to_s ]
+
+          when DateTime, Time
+            [ 'xsd:datetime', value.utc.iso8601 ]
+
+          when TrueClass, FalseClass
+            [ 'xsd:boolean', value.to_s ]
+
+          when Symbol, String
+            [ 'xsd:string', value.to_s ]
+
+          else
+            raise Identikey::Error, "Unsupported type #{value.class} [ #{value.inspect} ]"
+          end
+
+          { attributeID: name.to_s,
+            value: { '@xsi:type': type, content!: value } }
+        end
+      end
+
     # protected
 
   end

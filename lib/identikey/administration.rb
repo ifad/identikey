@@ -21,24 +21,12 @@ module Identikey
     def logon(username:, password:, domain: 'master')
       resp = super(message: {
         attributeSet: {
-          attributes: [
-            { attributeID: 'CREDFLD_DOMAIN',
-              value: { '@xsi:type': 'xsd:string', content!: domain.to_s }
-            },
-
-            { attributeID: 'CREDFLD_PASSWORD',
-              value: { '@xsi:type': 'xsd:string', content!: password.to_s }
-            },
-
-            { attributeID: 'CREDFLD_USERID',
-              value: { '@xsi:type': 'xsd:string', content!: username.to_s }
-            },
-
-            { attributeID: 'CREDFLD_PASSWORD_FORMAT',
-              value: { '@xsi:type': 'xsd:unsignedInt', content!: 0
-              }
-            }
-          ]
+          attributes: typed_attributes_list_from(
+            CREDFLD_DOMAIN:          domain,
+            CREDFLD_PASSWORD:        password,
+            CREDFLD_USERID:          username,
+            CREDFLD_PASSWORD_FORMAT: Unsigned(0)
+          )
         }
       })
 
@@ -48,11 +36,9 @@ module Identikey
     def logoff(session_id:)
       resp = super(message: {
         attributeSet: {
-          attributes: [
-            { attributeID: 'CREDFLD_SESSION_ID',
-              value: { '@xsi:type': 'xsd:string', content!: session_id.to_s }
-            }
-          ]
+          attributes: typed_attributes_list_from(
+            CREDFLD_SESSION_ID: session_id
+          )
         }
       })
 
@@ -62,11 +48,9 @@ module Identikey
     def sessionalive(session_id:)
       resp = super(message: {
         attributeSet: {
-          attributes: [
-            { attributeID: 'CREDFLD_SESSION_ID',
-              value: { '@xsi:type': 'xsd:string', content!: session_id.to_s }
-            }
-          ]
+          attributes: typed_attributes_list_from(
+            CREDFLD_SESSION_ID: session_id
+          )
         }
       })
 
@@ -120,12 +104,10 @@ module Identikey
       user_execute(
         session_id: session_id,
         cmd: 'USERCMD_VIEW',
-        attributes: [
-          { attributeID: 'USERFLD_USERID',
-            value: { '@xsi:type': 'xsd:string', content!: username } },
-          { attributeID: 'USERFLD_DOMAIN',
-            value: { '@xsi:type': 'xsd:string', content!: domain } }
-        ]
+        attributes: typed_attributes_list_from(
+          USERFLD_USERID: username,
+          USERFLD_DOMAIN: domain
+        )
       )
     end
 
@@ -145,10 +127,9 @@ module Identikey
       digipass_execute(
         session_id: session_id,
         cmd: 'DIGIPASSCMD_VIEW',
-        attributes: [
-          { attributeID: 'DIGIPASSFLD_SERNO',
-            value: { '@xsi:type': 'xsd:string', content!: serial_no } }
-        ]
+        attributes: typed_attributes_list_from(
+          DIGIPASSFLD_SERNO: serial_no
+        )
       )
     end
 
@@ -156,10 +137,9 @@ module Identikey
       digipass_execute(
         session_id: session_id,
         cmd: 'DIGIPASSCMD_UNASSIGN',
-        attributes: [
-          { attributeID: 'DIGIPASSFLD_SERNO',
-            value: { '@xsi:type': 'xsd:string', content!: serial_no } }
-        ]
+        attributes: typed_attributes_list_from(
+          DIGIPASSFLD_SERNO: serial_no
+        )
       )
     end
 
@@ -167,16 +147,12 @@ module Identikey
       digipass_execute(
         session_id: session_id,
         cmd: 'DIGIPASSCMD_ASSIGN',
-        attributes: [
-          { attributeID: 'DIGIPASSFLD_SERNO',
-            value: { '@xsi:type': 'xsd:string', content!: serial_no } },
-          { attributeID: 'DIGIPASSFLD_ASSIGNED_USERID',
-            value: { '@xsi:type': 'xsd:string', content!: username } },
-          { attributeID: 'DIGIPASSFLD_DOMAIN',
-            value: { '@xsi:type': 'xsd:string', content!: domain } },
-          { attributeID: 'DIGIPASSFLD_GRACE_PERIOD_DAYS',
-            value: { '@xsi:type': 'xsd:int', content!: grace_period } }
-        ]
+        attributes: typed_attributes_list_from(
+          DIGIPASSFLD_SERNO: serial_no,
+          DIGIPASSFLD_ASSIGNED_USERID: username,
+          DIGIPASSFLD_DOMAIN: domain,
+          DIGIPASSFLD_GRACE_PERIOD_DAYS: grace_period
+        )
       )
     end
 
@@ -196,14 +172,11 @@ module Identikey
       digipassappl_execute(
         session_id: session_id,
         cmd: 'DIGIPASSAPPLCMD_TEST_OTP',
-        attributes: [
-          { attributeID: 'DIGIPASSAPPLFLD_SERNO',
-            value: { '@xsi:type': 'xsd:string', content!: serial_no } },
-          { attributeID: 'DIGIPASSAPPLFLD_APPL_NAME',
-            value: { '@xsi:type': 'xsd:string', content!: appl } },
-          { attributeID: 'DIGIPASSAPPLFLD_RESPONSE',
-            value: { '@xsi:type': 'xsd:string', content!: otp } }
-        ]
+        attributes: typed_attributes_list_from(
+          DIGIPASSAPPLFLD_SERNO: serial_no,
+          DIGIPASSAPPLFLD_APPL_NAME: appl,
+          DIGIPASSAPPLFLD_RESPONSE: otp
+        )
       )
     end
 
