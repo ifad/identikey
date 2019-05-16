@@ -18,7 +18,7 @@ module Identikey
       :admin_session_query, :user_execute,
       :digipass_execute, :digipassappl_execute
 
-    def logon(username:, password:, domain: 'master')
+    def logon(username:, password:, domain:)
       resp = super(message: {
         attributeSet: {
           attributes: typed_attributes_list_from(
