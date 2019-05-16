@@ -127,6 +127,17 @@ module Identikey
       )
     end
 
+    def user_execute_DELETE(session_id:, username:, domain:)
+      user_execute(
+        session_id: session_id,
+        cmd: 'USERCMD_DELETE',
+        attributes: typed_attributes_list_from(
+          USERFLD_USERID: username,
+          USERFLD_DOMAIN: domain
+        )
+      )
+    end
+
     def digipass_execute(session_id:, cmd:, attributes: [])
       resp = super(message: {
         sessionID: session_id,

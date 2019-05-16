@@ -74,6 +74,27 @@ module Identikey
         replace(user, persisted: true)
       end
 
+      def destroy!
+        unless self.persisted?
+          raise Identikey::Error, "User #{self.username} is not persisted"
+        end
+
+        unless self.username && self.domain
+          raise Identikey::Error, "User #{self} is missing username and/or domain"
+        end
+
+        stat, _, error = @session.execute(
+          :user_execute_DELETE, username: username, domain: domain)
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::Error, "Delete user failed: #{stat} - #{error}"
+        end
+
+        @persisted = false
+
+        self
+      end
+
       protected
         def replace(user, persisted: false)
           self.username             = user['USERFLD_USERID']
