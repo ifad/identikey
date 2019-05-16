@@ -111,6 +111,22 @@ module Identikey
       )
     end
 
+    def user_execute_CREATE(session_id:, attributes:)
+      user_execute(
+        session_id: session_id,
+        cmd: 'USERCMD_CREATE',
+        attributes: typed_attributes_list_from(attributes)
+      )
+    end
+
+    def user_execute_UPDATE(session_id:, attributes:)
+      user_execute(
+        session_id: session_id,
+        cmd: 'USERCMD_UPDATE',
+        attributes: typed_attributes_list_from(attributes)
+      )
+    end
+
     def digipass_execute(session_id:, cmd:, attributes: [])
       resp = super(message: {
         sessionID: session_id,
