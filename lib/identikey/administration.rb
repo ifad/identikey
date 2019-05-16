@@ -116,7 +116,7 @@ module Identikey
       parse_response resp, :user_execute_response
     end
 
-    def user_execute_VIEW(session_id:, username:, domain: 'root')
+    def user_execute_VIEW(session_id:, username:, domain:)
       user_execute(
         session_id: session_id,
         cmd: 'USERCMD_VIEW',
@@ -163,7 +163,7 @@ module Identikey
       )
     end
 
-    def digipass_execute_ASSIGN(session_id:, serial_no:, username:, domain: 'root', grace_period: 0)
+    def digipass_execute_ASSIGN(session_id:, serial_no:, username:, domain:, grace_period: 0)
       digipass_execute(
         session_id: session_id,
         cmd: 'DIGIPASSCMD_ASSIGN',

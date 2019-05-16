@@ -6,7 +6,7 @@ module Identikey
 
     operations :auth_user
 
-    def auth_user(user, otp, domain: 'root')
+    def auth_user(user, domain, otp)
       resp = super(message: {
         credentialAttributeSet: {
           attributes: [
@@ -39,13 +39,13 @@ module Identikey
       parse_response resp, :auth_user_response
     end
 
-    def self.valid_otp?(user, otp)
-      status, _ = new.auth_user(user, otp)
+    def self.valid_otp?(user, domain, otp)
+      status, _ = new.auth_user(user, domain, otp)
       return status == 'STAT_SUCCESS'
     end
 
-    def self.validate!(user, otp)
-      status, result, _ = new.auth_user(user, otp)
+    def self.validate!(user, domain, otp)
+      status, result, _ = new.auth_user(user, domain, otp)
       if status == 'STAT_SUCCESS'
         return true
       else

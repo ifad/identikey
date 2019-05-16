@@ -66,9 +66,9 @@ module Identikey
         replace(digipass)
       end
 
-      def assign!(username)
+      def assign!(username, domain)
         stat, digipass, error = @session.execute(
-          :digipass_execute_ASSIGN, serial_no: self.serial, username: username)
+          :digipass_execute_ASSIGN, serial_no: self.serial, username: username, domain: domain)
 
         if stat != 'STAT_SUCCESS'
           raise Identikey::Error, "Unassign digipass failed: #{stat} - #{error}"
