@@ -22,19 +22,42 @@ module Identikey
       parse_response resp, :auth_user_response
     end
 
+    # OTPs can only be sequences of digits.
+    # Please note that the special 'push' value
+    #
+    #
+    def validate_otp_format!(otp)
+    end
+
     def self.valid_otp?(user, domain, otp)
       status, _ = new.auth_user(user, domain, otp)
-      return status == 'STAT_SUCCESS'
+      return otp_validated_ok?(status, result)
     end
 
     def self.validate!(user, domain, otp)
       status, result, _ = new.auth_user(user, domain, otp)
-      if status == 'STAT_SUCCESS'
+
+      if otp_validated_ok?(status, result)
         return true
       else
         error_message = result['CREDFLD_STATUS_MESSAGE']
         raise Identikey::Error, "OTP Validation error (#{status}): #{error_message}"
       end
+    end
+
+    # Given an authentication status and result message, returns true if
+    # that defines a successful OTP validation or not.
+    #
+    # For all cases, except where the OTP is "push", Identikey returns a
+    # status that is != than `STAT_SUCCESS`. But when the OTP is "push",
+    # then Identikey returns a `STAT_SUCCESS` with a "password is wrong"
+    # message in the `CREDFLD_STATUS_MESSAGE`.
+    #
+    # This method checks for both cases.. Success means a `STAT_SUCCESS`
+    # and nothing in the `CREDFLD_STATUS_MESSAGE`.
+    #
+    def self.otp_validated_ok?(status, result)
+      status == 'STAT_SUCCESS' && !result.key?('CREDFLD_STATUS_MESSAGE')
     end
   end
 end
