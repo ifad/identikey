@@ -30,7 +30,7 @@ module Identikey
     end
 
     def self.valid_otp?(user, domain, otp)
-      status, _ = new.auth_user(user, domain, otp)
+      status, result, _ = new.auth_user(user, domain, otp)
       return otp_validated_ok?(status, result)
     end
 
