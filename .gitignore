@@ -12,5 +12,9 @@ Gemfile.lock
 
 .byebug_history
 
+# vim swap files
+
+.*.sw?
+
 # rspec failure tracking
 .rspec_status

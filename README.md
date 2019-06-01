@@ -60,6 +60,28 @@ Identikey::Administration.configure do
 end
 ```
 
+By default, all SOAP requests and responses are logged to `log/identikey.log`.
+
+If you want to reduce the logging level please use:
+
+```
+Identikey::Authentication.configure do
+  log_level :info # or one of [:debug, :warn, :error, :fatal]
+end
+```
+
+Or to disable it altogether (not recommended):
+
+```
+Identikey::Authentication.configure do
+  log false
+end
+```
+
+The `configure` block accepts all Savon options, for which documentation
+is available here: http://savonrb.com/version2/globals.html feel free to
+amend it to suit your needs.
+
 ## Usage
 
 This is still in alpha stage, as such there is not much documentation. Have a

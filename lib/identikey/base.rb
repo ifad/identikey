@@ -25,8 +25,9 @@ module Identikey
 
         encoding: 'UTF-8',
 
-        logger: Logger.new('log/soap.log'),
+        logger: Logger.new('log/identikey.log'),
         log_level: :debug,
+        log: true,
         pretty_print_xml: true
       }
 
