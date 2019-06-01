@@ -82,6 +82,32 @@ The `configure` block accepts all Savon options, for which documentation
 is available here: http://savonrb.com/version2/globals.html feel free to
 amend it to suit your needs.
 
+The only option whose semantics differ from the default is `filters`, as
+it adds handling the faulty parameter passing design in Identikey, where
+the same elements are used to transmit different business informatios.
+
+By default, sensitive values attribute are filtered out from the logs.
+Other attributes to filter out can be specified by prefixing them with
+`identikey:`. Example, filter out `CREDFLD_PASSWORD` and `CREDFLD_USERID`:
+
+Example, filter out `CREDFLD_PASSWORD` and `CREDFLD_USERID`:
+
+```
+Identikey::Authentication.configure do
+  filters [ 'identikey:CREDFLD_PASSWORD', 'identikey:CREDFLD_USERID' ]
+end
+```
+
+Please note that the following attributes are filtered out by default:
+
+* CREDFLD_PASSWORD
+* CREDFLD_STATIC_PASSWORD
+* CREDFLD_SESSION_ID
+
+Please note that if you set your custom filters, these will override the
+defaults and you should also take care of filtering the above parameters
+in addition to the ones you want to filter out.
+
 ## Usage
 
 This is still in alpha stage, as such there is not much documentation. Have a

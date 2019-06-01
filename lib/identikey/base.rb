@@ -15,28 +15,77 @@ module Identikey
     def self.client(options = nil)
       return super() unless options
 
-      defaults = {
-        endpoint: 'https://localhost:8888/',
+      options = DEFAULTS.merge(options)
+      options = process_identikey_filters(options)
 
-        ssl_version: :TLSv1_2,
-        ssl_verify_mode: :none,
-
-        headers: default_user_agent_header,
-
-        encoding: 'UTF-8',
-
-        logger: Logger.new('log/identikey.log'),
-        log_level: :debug,
-        log: true,
-        pretty_print_xml: true
-      }
-
-      super defaults.merge(options)
+      super options
     end
 
     def self.default_user_agent_header
       {'User-Agent' => "ruby/identikey #{Identikey::VERSION}"}
     end
+
+    # Loops over the filters option content and adds Identikey
+    # specific parameter filtering.
+    #
+    # Due to faulty design in the Identikey SOAP endpoint, the
+    # parameter filters require context-dependant logic as all
+    # attributes are passed in `<attributeID>` elements, while
+    # all values are passed in `<value>` elements.
+    #
+    # Identikey attributes to filter out are specified in the
+    # `filters` option with the `identikey:` prefix.
+    #
+    # Example, filter out the `CREDFLD_PASSWORD` field from
+    # the logs (done by default):
+    #
+    # configure do
+    #   filters [ 'identikey:CREDFLD_PASSWORD' ]
+    # end
+    #
+    def self.process_identikey_filters(options)
+      filters = options[:filters] || []
+
+      options[:filters] = filters.map do |filter|
+        if filter.to_s =~ /^identikey:(.+)/
+          filter = identikey_filter_proc_for($1)
+        end
+
+        filter
+      end
+
+      return options
+    end
+
+    def self.identikey_filter_proc_for(attribute)
+      lambda do |document|
+        document.xpath("//attributeID[text()='#{attribute}']/../value").each do |node|
+          node.content = '***FILTERED***'
+        end
+      end
+    end
+
+    DEFAULTS = {
+      endpoint: 'https://localhost:8888/',
+
+      ssl_version: :TLSv1_2,
+      ssl_verify_mode: :none,
+
+      headers: default_user_agent_header,
+
+      encoding: 'UTF-8',
+
+      logger: Logger.new('log/identikey.log'),
+      log_level: :debug,
+      log: true,
+      pretty_print_xml: true,
+
+      filters: [
+        'identikey:CREDFLD_PASSWORD',
+        'identikey:CREDFLD_STATIC_PASSWORD',
+        'identikey:CREDFLD_SESSION_ID'
+      ]
+    }.freeze
 
     def endpoint
       self.class.client.globals[:endpoint]
