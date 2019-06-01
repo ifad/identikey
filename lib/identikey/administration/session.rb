@@ -59,10 +59,10 @@ module Identikey
         stat == 'STAT_SUCCESS'
       end
 
-      def alive?
+      def alive?(log: true)
         return false unless logged_on?
 
-        stat, _ = @client.sessionalive session_id: @session_id
+        stat, _ = @client.ping session_id: @session_id, log: log
 
         stat == 'STAT_SUCCESS'
       end

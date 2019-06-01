@@ -57,6 +57,18 @@ module Identikey
       parse_response resp, :sessionalive_response
     end
 
+    # Like sessionalive, but allows to disable logging if the
+    # `log:` keyword is set to false.
+    #
+    def ping(session_id:, log:)
+      old_log = client.globals[:log]
+      client.globals[:log] = log
+
+      sessionalive(session_id: session_id)
+    ensure
+      client.globals[:log] = old_log
+    end
+
     def admin_session_query(session_id:)
       attributes = [ ]
 
