@@ -81,6 +81,7 @@ module Identikey
       pretty_print_xml: true,
 
       filters: [
+        'sessionID',
         'identikey:CREDFLD_PASSWORD',
         'identikey:CREDFLD_STATIC_PASSWORD',
         'identikey:CREDFLD_SESSION_ID'
