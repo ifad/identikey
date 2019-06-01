@@ -1,6 +1,6 @@
 # Identikey
 
-This library is a thin and incomplete wrapper of the VASCO Identikey SOAP API.
+This library is a thin yet incomplete wrapper of the VASCO Identikey SOAP API.
 
 Vasco Identikey has been recently re-branded as OneSpan Authentication Server.
 
@@ -18,7 +18,7 @@ port 8888/TCP the SOAP protocol over HTTPS.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'identikey', github: 'ifad/identikey'
+gem 'identikey'
 ```
 
 And then execute:
@@ -64,7 +64,7 @@ By default, all SOAP requests and responses are logged to `log/identikey.log`.
 
 If you want to reduce the logging level please use:
 
-```
+```ruby
 Identikey::Authentication.configure do
   log_level :info # or one of [:debug, :warn, :error, :fatal]
 end
@@ -72,7 +72,7 @@ end
 
 Or to disable it altogether (not recommended):
 
-```
+```ruby
 Identikey::Authentication.configure do
   log false
 end
@@ -84,15 +84,15 @@ amend it to suit your needs.
 
 The only option whose semantics differ from the default is `filters`, as
 it adds handling the faulty parameter passing design in Identikey, where
-the same elements are used to transmit different business informatios.
+the same elements are used to transmit different business informations.
 
 By default, sensitive values attribute are filtered out from the logs.
 Other attributes to filter out can be specified by prefixing them with
-`identikey:`. Example, filter out `CREDFLD_PASSWORD` and `CREDFLD_USERID`:
+`identikey:`.
 
 Example, filter out `CREDFLD_PASSWORD` and `CREDFLD_USERID`:
 
-```
+```ruby
 Identikey::Authentication.configure do
   filters [ 'identikey:CREDFLD_PASSWORD', 'identikey:CREDFLD_USERID' ]
 end
@@ -100,9 +100,9 @@ end
 
 Please note that the following attributes are filtered out by default:
 
-* CREDFLD_PASSWORD
-* CREDFLD_STATIC_PASSWORD
-* CREDFLD_SESSION_ID
+* `CREDFLD_PASSWORD`
+* `CREDFLD_STATIC_PASSWORD`
+* `CREDFLD_SESSION_ID`
 
 Please note that if you set your custom filters, these will override the
 defaults and you should also take care of filtering the above parameters
