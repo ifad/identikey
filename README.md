@@ -156,6 +156,34 @@ d.unassign!
 s.logoff
 ```
 
+## Logging to separate files
+
+You can and are encouraged to configure different logging destinations
+for the different API endpoints, as follows:
+
+```ruby
+Identikey::Administration.configure do
+  logger   Logger.new("log/#{Rails.env}.identikey.admin.log")
+end
+
+Identikey::Authentication.configure do
+  logger   Logger.new("log/#{Rails.env}.identikey.admin.log")
+end
+```
+
+However be aware of a caveat, as Identikey uses Savon that uses HTTPI
+and the latter has a global logger, that Savon sets (and overwrites)
+upon calls to `logger`.
+
+In the above scenario, you can use a different logfile for HTTPI:
+
+```ruby
+HTTPI.logger = Logger.new("log/#{Rails.env}.identikey.httpi.log")
+```
+
+However please be aware of side-effects with other components of
+your application.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then,
