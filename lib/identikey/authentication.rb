@@ -22,13 +22,6 @@ module Identikey
       parse_response resp, :auth_user_response
     end
 
-    # OTPs can only be sequences of digits.
-    # Please note that the special 'push' value
-    #
-    #
-    def validate_otp_format!(otp)
-    end
-
     def self.valid_otp?(user, domain, otp)
       status, result, _ = new.auth_user(user, domain, otp)
       return otp_validated_ok?(status, result)
