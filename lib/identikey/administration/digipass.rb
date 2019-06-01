@@ -45,7 +45,7 @@ module Identikey
           :digipass_execute_VIEW, serial_no: serial_no)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "Find digipass failed: #{stat} - #{error}"
+          raise Identikey::NotFound, "Find digipass failed: #{stat} - #{error}"
         end
 
         replace(digipass)
@@ -60,7 +60,7 @@ module Identikey
           :digipass_execute_UNASSIGN, serial_no: self.serial)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "Assign digipass failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Assign digipass failed: #{stat} - #{error}"
         end
 
         replace(digipass)
@@ -71,7 +71,7 @@ module Identikey
           :digipass_execute_ASSIGN, serial_no: self.serial, username: username, domain: domain)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "Unassign digipass failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Unassign digipass failed: #{stat} - #{error}"
         end
 
         replace(digipass)
@@ -84,7 +84,7 @@ module Identikey
         # Stat is useless here - it reports whether the call or not has
         # succeeded, not whether the OTP is valid
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "Test OTP failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Test OTP failed: #{stat} - #{error}"
         end
 
         appl['DIGIPASSAPPLFLD_RESULT_CODE'] == '0'

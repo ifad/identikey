@@ -134,11 +134,11 @@ module Identikey
         body = resp.body
 
         if body.size.zero?
-          raise Identikey::Error, "Empty response received"
+          raise Identikey::ParseError, "Empty response received"
         end
 
         unless body.key?(root_element)
-          raise Identikey::Error, "Expected response to have #{root_element}, found #{body.keys.join(', ')}"
+          raise Identikey::ParseError, "Expected response to have #{root_element}, found #{body.keys.join(', ')}"
         end
 
         # The root results element
@@ -155,7 +155,7 @@ module Identikey
         # The results element
         #
         unless root.key?(:results)
-          raise Identikey::Error, "Results element not found below #{root_element}"
+          raise Identikey::ParseError, "Results element not found below #{root_element}"
         end
 
         results = root[:results]
@@ -163,7 +163,7 @@ module Identikey
         # Result code
         #
         unless results.key?(:result_codes)
-          raise Identikey::Error, "Result codes not found below #{root_element}"
+          raise Identikey::ParseError, "Result codes not found below #{root_element}"
         end
 
         result_code = results[:result_codes][:status_code_enum] || 'STAT_UNKNOWN'
@@ -171,7 +171,7 @@ module Identikey
         # Result attributes
         #
         unless results.key?(:result_attribute)
-          raise Identikey::Error, "Result attribute not found below #{root_element}"
+          raise Identikey::ParseError, "Result attribute not found below #{root_element}"
         end
 
         results_attr = results[:result_attribute]
@@ -257,7 +257,7 @@ module Identikey
             next
 
           else
-            raise Identikey::Error, "#{name} type #{value.class} is unsupported"
+            raise Identikey::UsageError, "#{name} type #{value.class} is unsupported"
           end
 
           { attributeID: name.to_s,

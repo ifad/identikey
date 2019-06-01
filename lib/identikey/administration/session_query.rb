@@ -6,7 +6,7 @@ module Identikey
         stat, sessions, error = session.execute(:admin_session_query)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "query failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "query failed: #{stat} - #{error}"
         end
 
         sessions.map do |sess|

@@ -37,7 +37,7 @@ module Identikey
           :user_execute_VIEW, username: username, domain: domain)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "Find user failed: #{stat} - #{error}"
+          raise Identikey::NotFound, "Find user failed: #{stat} - #{error}"
         end
 
         replace(user, persisted: true)
@@ -68,7 +68,7 @@ module Identikey
         })
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "Save user failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Save user failed: #{stat} - #{error}"
         end
 
         replace(user, persisted: true)
@@ -76,18 +76,18 @@ module Identikey
 
       def destroy!
         unless self.persisted?
-          raise Identikey::Error, "User #{self.username} is not persisted"
+          raise Identikey::UsageError, "User #{self.username} is not persisted"
         end
 
         unless self.username && self.domain
-          raise Identikey::Error, "User #{self} is missing username and/or domain"
+          raise Identikey::UsageError, "User #{self} is missing username and/or domain"
         end
 
         stat, _, error = @session.execute(
           :user_execute_DELETE, username: username, domain: domain)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "Delete user failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Delete user failed: #{stat} - #{error}"
         end
 
         @persisted = false

@@ -26,7 +26,7 @@ module Identikey
         stat, sess, error = @client.logon(username: @username, password: @password, domain: @domain)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::Error, "logon failed: #{stat} - #{error}"
+          raise Identikey::LogonFailed, "logon failed: #{stat} - #{error}"
         end
 
         @privileges = parse_privileges sess['CREDFLD_LOGICAL_ADMIN_PRIVILEGES']
@@ -47,7 +47,7 @@ module Identikey
         stat, _, error = @client.logoff session_id: @session_id
 
         unless stat == 'STAT_ADMIN_SESSION_STOPPED' || stat == 'STAT_SUCCESS'
-          raise Identikey::Error, "logoff failed: #{stat} - #{error}"
+          raise Identikey::LogonFailed, "logoff failed: #{stat} - #{error}"
         end
 
         @privileges = nil
@@ -103,7 +103,7 @@ module Identikey
 
       def require_logged_on!
         unless logged_on?
-          raise Identikey::Error, "Session is not logged on at the moment"
+          raise Identikey::UsageError, "Session is not logged on at the moment"
         end
       end
 

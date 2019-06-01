@@ -34,7 +34,7 @@ module Identikey
         return true
       else
         error_message = result['CREDFLD_STATUS_MESSAGE']
-        raise Identikey::Error, "OTP Validation error (#{status}): #{error_message}"
+        raise Identikey::OperationFailed, "OTP Validation error (#{status}): #{error_message}"
       end
     end
 
