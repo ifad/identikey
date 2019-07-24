@@ -219,5 +219,18 @@ module Identikey
       )
     end
 
+    def digipassappl_execute_SET_PIN(session_id:, serial_no:, appl:, pin:)
+      digipassappl_execute(
+        session_id: session_id,
+        cmd: 'DIGIPASSAPPLCMD_SET_PIN',
+        attributes: typed_attributes_list_from(
+          DIGIPASSAPPLFLD_SERNO: serial_no,
+          DIGIPASSAPPLFLD_APPL_NAME: appl,
+          DIGIPASSAPPLFLD_NEW_PIN: pin,
+          DIGIPASSAPPLFLD_NEW_PIN_CONF: pin
+        )
+      )
+    end
+
   end
 end

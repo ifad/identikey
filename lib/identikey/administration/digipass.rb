@@ -92,6 +92,19 @@ module Identikey
         appl['DIGIPASSAPPLFLD_RESULT_CODE'] == '0'
       end
 
+      def set_pin(pin, application: nil)
+        application ||= self.default_application!
+
+        stat, _, error = @session.execute(
+          :digipassappl_execute_SET_PIN, serial_no: self.serial, appl: application, pin: pin)
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::OperationFailed, "Set PIN failed: #{stat} - #{error}"
+        end
+
+        true
+      end
+
       def default_application!
         if self.applications.size == 1
           self.applications.first
