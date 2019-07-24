@@ -5,8 +5,10 @@
 /doc/
 /pkg/
 /spec/reports/
+/spec/test.env
 /tmp/
 /log/
+/sdk
 
 Gemfile.lock
 

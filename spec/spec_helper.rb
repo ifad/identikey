@@ -7,6 +7,10 @@ end
 
 require 'byebug'
 
+require 'dotenv'
+# Load environment variables.
+Dotenv.load 'spec/test.env'
+
 require 'identikey'
 
 RSpec.configure do |config|
