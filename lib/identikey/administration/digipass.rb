@@ -77,9 +77,11 @@ module Identikey
         replace(digipass)
       end
 
-      def test_otp(otp)
+      def test_otp(otp, application: nil)
+        application ||= self.default_application!
+
         stat, appl, error = @session.execute(
-          :digipassappl_execute_TEST_OTP, serial_no: self.serial, appl: self.application, otp: otp)
+          :digipassappl_execute_TEST_OTP, serial_no: self.serial, appl: application, otp: otp)
 
         # Stat is useless here - it reports whether the call or not has
         # succeeded, not whether the OTP is valid
@@ -88,6 +90,20 @@ module Identikey
         end
 
         appl['DIGIPASSAPPLFLD_RESULT_CODE'] == '0'
+      end
+
+      def default_application!
+        if self.applications.size == 1
+          self.applications.first
+        else
+          raise Identikey::UsageError,
+            "Digipass #{self.serial} has more than one application. " \
+            "Please specify which one to use out of #{applications.join(', ')}"
+        end
+      end
+
+      def applications
+        @_applications ||= @attributes.fetch(:application).split(',')
       end
 
       def method_missing(name, *args, &block)
