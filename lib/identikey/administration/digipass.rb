@@ -6,6 +6,36 @@ module Identikey
         new(session).find(serial_no)
       end
 
+      def self.search(session:, query:, options: {})
+        query_keys = {
+          'applications'   => 'DIGIPASSFLD_ACTIVE_APPL_NAMES',
+          'app_types'      => 'DIGIPASSFLD_ACTIVE_APPL_TYPES',
+          'status'         => 'DIGIPASSFLD_ASSIGN_STATUS',
+          'user_org_unit'  => 'DIGIPASSFLD_ASSIGNED_USER_ORG_UNIT',
+          'username'       => 'DIGIPASSFLD_ASSIGNED_USERID',
+          'device_id'      => 'DIGIPASSFLD_DEVICE_ID',
+          'direct'         => 'DIGIPASSFLD_DIRECT_ASSIGN_ONLY',
+          'domain'         => 'DIGIPASSFLD_DOMAIN',
+          'type'           => 'DIGIPASSFLD_DPTYPE',
+          'expired'        => 'DIGIPASSFLD_EXPIRED',
+          'grace_expired'  => 'DIGIPASSFLD_GRACE_PERIOD_EXPIRED',
+          'license_serial' => 'DIGIPASSFLD_LICENSE_SERNO',
+          'org_unit'       => 'DIGIPASSFLD_ORGANIZATIONAL_UNIT',
+          'serial'         => 'DIGIPASSFLD_SERNO'
+        }
+
+        stat, digipasses, error = session.execute(:digipass_query,
+          attributes:    Base.search_attributes_from(query, attribute_map: query_keys),
+          query_options: Base.search_options_from(options))
+
+        case stat
+        when 'STAT_SUCCESS'   then (digipasses||[]).map {|user| new(session, user) }
+        when 'STAT_NOT_FOUND' then []
+        else
+          raise Identikey::Error, "Search digipass failed: #{stat} - #{error}"
+        end
+      end
+
       def initialize(session, digipass = nil)
         @session = session
 

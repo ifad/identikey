@@ -16,7 +16,7 @@ module Identikey
 
     operations :logon, :logoff, :sessionalive,
       :admin_session_query, :user_execute, :user_query,
-      :digipass_execute, :digipassappl_execute
+      :digipass_execute, :digipass_query, :digipassappl_execute
 
     def logon(username:, password:, domain:)
       resp = super(message: {
@@ -208,6 +208,20 @@ module Identikey
         )
       )
     end
+
+
+    def digipass_query(session_id:, attributes:, query_options:)
+      resp = super(message: {
+        sessionID: session_id,
+        attributeSet: {
+          attributes: typed_attributes_query_list_from(attributes)
+        },
+        queryOptions: query_options
+      })
+
+      parse_response resp, :digipass_query_response
+    end
+
 
     def digipassappl_execute(session_id:, cmd:, attributes:)
       resp = super(message: {

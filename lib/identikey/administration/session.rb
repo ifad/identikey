@@ -85,6 +85,14 @@ module Identikey
         Digipass.find session: self, serial_no: serial_no
       end
 
+      def search_digipasses(query)
+        require_logged_on!
+
+        options = query.delete(:options) || {}
+
+        Digipass.search session: self, query: query, options: options
+      end
+
       def find_user(username, domain = nil)
         require_logged_on!
 
