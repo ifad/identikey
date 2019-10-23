@@ -91,6 +91,14 @@ module Identikey
         User.find session: self, username: username, domain: domain || self.domain
       end
 
+      def search_users(query)
+        require_logged_on!
+
+        options = query.delete(:options) || {}
+
+        User.search session: self, query: query, options: options
+      end
+
       def inspect
         "#<#{self.class.name} sid=#@session_id username=#@username domain=#@domain product=#@product>"
       end

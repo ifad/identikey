@@ -220,11 +220,34 @@ module Identikey
         end
       end
 
+      def typed_attributes_list_from(hash)
+        self.class.typed_attributes_list_from(hash)
+      end
+
+      # Calls typed_attribute_query_list_from() by removing the
+      # nil values from the given hash.
+      #
+      # The nil values are ignored when calling API endpoints that
+      # are not query ones, as such there is no point in adding an
+      # attributeOption null:true on those.
+      #
+      def self.typed_attributes_list_from(hash)
+        typed_attributes_query_list_from(hash.reject {|k,v| v.nil?})
+      end
+
+      def typed_attributes_query_list_from(hash)
+        self.class.typed_attributes_query_list_from(hash)
+      end
+
       # Converts and hash keyed by attribute name into an array of hashes
       # whose keys are the attribute name as attributeID and the value as
       # a Gyoku-compatible hash with the xsd:type annotation. The type is
       # inferred from the Ruby value type and the contents are serialized
       # as a string formatted as per the XSD DTD definition.
+      #
+      # Further, this supports "virtual" attributes with a "NOT_" prefix.
+      # If the NOT_ prefix is set to the attribute name then the negative
+      # attributeOption is set.
       #
       # <rant>
       # This code should not exist, because defining argument types is what
@@ -235,8 +258,15 @@ module Identikey
       # than an aid.
       # </rant>
       #
-      def typed_attributes_list_from(hash)
-        hash.map do |name, value|
+      def self.typed_attributes_query_list_from(hash)
+        hash.map do |full_name, value|
+
+          parse = /^(not_)?(.*)/i.match(full_name.to_s)
+          name  = parse[2]
+
+          options = []
+          options.push(negative: true) if !parse[1].nil?
+
           type, value = case value
 
           when Unsigned
@@ -255,15 +285,59 @@ module Identikey
             [ 'xsd:string', value.to_s ]
 
           when NilClass
-            next
+            options.push(null: true)
+            [ 'xsd:string', '' ]
 
           else
-            raise Identikey::UsageError, "#{name} type #{value.class} is unsupported"
+            raise Identikey::UsageError, "#{full_name} type #{value.class} is unsupported"
           end
 
-          { attributeID: name.to_s,
+          { attributeID:      name,
+            attributeOptions: options,
             value: { '@xsi:type': type, content!: value } }
         end.compact
+      end
+
+      # Translates the given attributes map into an hash suitable to be passed
+      # to typed_attributes_query_list_from(). This is used only to DRY the
+      # invocations across the _query methods.
+      #
+      def self.search_attributes_from(query, attribute_map:)
+        query.inject({}) do |ret, (key, value)|
+
+          parse  = /^(not_)?(.*)/.match(key.to_s)
+          negate = !parse[1].nil?
+          name   =  parse[2]
+
+          attribute = attribute_map.fetch(name, nil)
+
+          if attribute.nil?
+            raise Identikey::UsageError, "Invalid search key: #{key}"
+          end
+
+          attribute = "NOT_#{attribute}" if negate
+
+          ret.update(attribute => value)
+        end
+      end
+
+      # Translate our search interface options into Identikey's _query methods
+      # interface options.
+      #
+      def self.search_options_from(options)
+        options.inject({}) do |ret, (option, value)|
+          attribute = {
+            'distinct' => 'distinct',
+            'limit'    => 'rowcount',
+            'offset'   => 'rowoffset',
+          }.fetch(option.to_s, nil)
+
+          if attribute.nil?
+            raise Identikey::UsageError, "Invalid search option: #{option}"
+          end
+
+          ret.update(attribute => value)
+        end
       end
 
     # protected

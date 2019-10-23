@@ -6,6 +6,37 @@ module Identikey
         new(session).find(username, domain)
       end
 
+      def self.search(session:, query:, options: {})
+        if query.key?(:has_digipass) && [true, false].include?(query[:has_digipass])
+          query[:has_digipass] = query[:has_digipass] ? 'Assigned' : 'Unassigned'
+        end
+
+        query_keys = {
+          'has_digipass' => 'USERFLD_HAS_DP',
+          'description'  => 'USERFLD_DESCRIPTION',
+          'disabled'     => 'USERFLD_DISABLED',
+          'domain'       => 'USERFLD_DOMAIN',
+          'email'        => 'USERFLD_EMAIL',
+          'expired'      => 'USERFLD_EXPIRED',
+          'locked'       => 'USERFLD_LOCKED',
+          'mobile'       => 'USERFLD_MOBILE',
+          'org_unit'     => 'USERFLD_ORGANIZATIONAL_UNIT',
+          'phone'        => 'USERFLD_PHONE',
+          'username'     => 'USERFLD_USERID',
+        }
+
+        stat, users, error = session.execute(:user_query,
+          attributes:    Base.search_attributes_from(query, attribute_map: query_keys),
+          query_options: Base.search_options_from(options))
+
+        case stat
+        when 'STAT_SUCCESS'   then (users||[]).map {|user| new(session, user) }
+        when 'STAT_NOT_FOUND' then []
+        else
+          raise Identikey::Error, "Search user failed: #{stat} - #{error}"
+        end
+      end
+
       attr_accessor :username
       attr_accessor :email
       attr_accessor :mobile

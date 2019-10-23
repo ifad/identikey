@@ -15,7 +15,7 @@ module Identikey
     client wsdl: './sdk/wsdl/administration.wsdl'
 
     operations :logon, :logoff, :sessionalive,
-      :admin_session_query, :user_execute,
+      :admin_session_query, :user_execute, :user_query,
       :digipass_execute, :digipassappl_execute
 
     def logon(username:, password:, domain:)
@@ -149,6 +149,20 @@ module Identikey
         )
       )
     end
+
+
+    def user_query(session_id:, attributes:, query_options:)
+      resp = super(message: {
+        sessionID: session_id,
+        attributeSet: {
+          attributes: typed_attributes_query_list_from(attributes)
+        },
+        queryOptions: query_options
+      })
+
+      parse_response resp, :user_query_response
+    end
+
 
     def digipass_execute(session_id:, cmd:, attributes: [])
       resp = super(message: {
