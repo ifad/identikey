@@ -7,8 +7,10 @@ module Identikey
       end
 
       def self.search(session:, query:, options: {})
-        if query.key?(:has_digipass) && [true, false].include?(query[:has_digipass])
-          query[:has_digipass] = query[:has_digipass] ? 'Assigned' : 'Unassigned'
+        [:has_digipass, :not_has_digipass].each do |funky_boolean|
+          if query.key?(funky_boolean) && [true, false].include?(query[funky_boolean])
+            query[funky_boolean] = query[funky_boolean] ? 'Assigned' : 'Unassigned'
+          end
         end
 
         query_keys = {
