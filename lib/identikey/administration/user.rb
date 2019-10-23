@@ -56,6 +56,7 @@ module Identikey
       attr_accessor :expires_at
       attr_accessor :expired
       attr_accessor :last_auth_attempt_at
+      attr_accessor :description
 
       def initialize(session, user = nil)
         @session = session
@@ -147,6 +148,7 @@ module Identikey
           self.expires_at           = user['USERFLD_EXPIRATION_TIME']
           self.expired              = user['USERFLD_EXPIRED']
           self.last_auth_attempt_at = user['USERFLD_LASTAUTHREQ_TIME']
+          self.description          = user['USERFLD_DESCRIPTION']
 
           @persisted = persisted
 
