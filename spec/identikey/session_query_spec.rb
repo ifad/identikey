@@ -21,8 +21,6 @@ RSpec.describe Identikey::Administration::SessionQuery do
 
     it { expect(@s1.all.size).to be >= 2 }
     it { expect(@s2.all.size).to eq(@s1.all.size) }
-
-    it { expect(@s1.all.select {|s| s.username == username }.size).to eq(2) }
   end
 
   context 'on a stale session' do
