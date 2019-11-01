@@ -28,13 +28,13 @@ module Identikey
     end
 
     def self.validate!(user, domain, otp)
-      status, result, _ = new.auth_user(user, domain, otp)
+      status, result, error_stack = new.auth_user(user, domain, otp)
 
       if otp_validated_ok?(status, result)
         return true
       else
         error_message = result['CREDFLD_STATUS_MESSAGE']
-        raise Identikey::OperationFailed, "OTP Validation error (#{status}): #{error_message}"
+        raise Identikey::OperationFailed.new("OTP Validation error (#{status}): #{error_message}", error_stack)
       end
     end
 
