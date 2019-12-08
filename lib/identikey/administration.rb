@@ -61,12 +61,7 @@ module Identikey
     # `log:` keyword is set to false.
     #
     def ping(session_id:, log:)
-      old_log = client.globals[:log]
-      client.globals[:log] = log
-
-      sessionalive(session_id: session_id)
-    ensure
-      client.globals[:log] = old_log
+      logging_to(log) { sessionalive(session_id: session_id) }
     end
 
     def admin_session_query(session_id:)
@@ -151,16 +146,23 @@ module Identikey
     end
 
 
-    def user_query(session_id:, attributes:, query_options:)
-      resp = super(message: {
-        sessionID: session_id,
-        attributeSet: {
-          attributes: typed_attributes_query_list_from(attributes)
-        },
-        queryOptions: query_options
-      })
+    # Executes a userQuery command that searches users. By default, it doesn't
+    # log anywhere. To enable logging to a specific destination, pass a logger
+    # as the log: option. To log to the default destination, pass `true` as
+    # the log: option.
+    #
+    def user_query(session_id:, attributes:, query_options:, log: false)
+      logging_to(log) do
+        resp = super(message: {
+          sessionID: session_id,
+          attributeSet: {
+            attributes: typed_attributes_query_list_from(attributes)
+          },
+          queryOptions: query_options
+        })
 
-      parse_response resp, :user_query_response
+        parse_response resp, :user_query_response
+      end
     end
 
 
@@ -259,6 +261,25 @@ module Identikey
         )
       )
     end
+
+    private
+      # Allows temporarily overriding the log destination. If it
+      # is set to `false` then logging is disabled altogether.
+      # If it is set to `true`, then this is a no-op.
+      #
+      def logging_to(destination)
+        old_log = client.globals[:log]
+
+        unless destination === true
+          client.globals[:log] = destination
+        end
+
+        yield
+
+      ensure
+        client.globals[:log] = old_log
+      end
+
 
   end
 end
