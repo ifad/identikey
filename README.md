@@ -186,14 +186,20 @@ your application.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then,
-run `rake` to run the tests. You can also run `bin/console` for an interactive
-prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies.
 
-To run specs, please copy `spec/test.env.example` into `spec/test.env` and
+Then, please copy `spec/test.env.example` into `spec/test.env` and
 populate it with your Identikey Authentication Server host, username, password
-and domain. You also need the Identikey SDK, that can be placed in `/sdk` and
+and domain.
+
+You also need the Identikey SDK, that can be placed in `sdk/` and
 its WSDL paths as well referenced in the `spec/test.env` file.
+
+Then, run `rake` to run the tests.
+
+You can also run `bin/console` for an interactive prompt that will allow you
+to experiment. It requires the same environment variables required by the
+specs.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
