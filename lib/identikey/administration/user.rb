@@ -102,31 +102,51 @@ module Identikey
         })
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::OperationFailed, "Save user failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Save user #{self.username} failed: #{stat} - #{error}"
         end
 
         replace(user, persisted: true)
       end
 
       def destroy!
-        unless self.persisted?
-          raise Identikey::UsageError, "User #{self.username} is not persisted"
-        end
-
-        unless self.username && self.domain
-          raise Identikey::UsageError, "User #{self} is missing username and/or domain"
-        end
+        ensure_persisted!
 
         stat, _, error = @session.execute(
           :user_execute_DELETE, username: username, domain: domain)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::OperationFailed, "Delete user failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Delete user #{self.username} failed: #{stat} - #{error}"
         end
 
         @persisted = false
 
         self
+      end
+
+      def clear_password!
+        ensure_persisted!
+
+        stat, _, error = @session.execute(
+          :user_execute_RESET_PASSWORD, username: username, domain: domain)
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::OperationFailed, "Clear user #{self.username} password failed: #{stat} - #{error}"
+        end
+
+        true
+      end
+
+      def set_password!(password)
+        ensure_persisted!
+
+        stat, _, error = @session.execute(
+          :user_execute_SET_PASSWORD, username: username, domain: domain, password: password)
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::OperationFailed, "Set user #{self.username} password failed: #{stat} - #{error}"
+        end
+
+        true
       end
 
       protected
@@ -155,6 +175,16 @@ module Identikey
           @persisted = persisted
 
           self
+        end
+
+        def ensure_persisted!
+          unless self.persisted?
+            raise Identikey::UsageError, "User #{self.username} is not persisted"
+          end
+
+          unless self.username && self.domain
+            raise Identikey::UsageError, "User #{self} is missing username and/or domain"
+          end
         end
     end
 

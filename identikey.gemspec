@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'byebug'
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'dotenv'
+  spec.add_development_dependency 'guard-rspec'
 end

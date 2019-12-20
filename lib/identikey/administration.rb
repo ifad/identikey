@@ -145,6 +145,30 @@ module Identikey
       )
     end
 
+    def user_execute_RESET_PASSWORD(session_id:, username:, domain:)
+      user_execute(
+        session_id: session_id,
+        cmd: 'USERCMD_RESET_PASSWORD',
+        attributes: typed_attributes_list_from(
+          USERFLD_USERID: username,
+          USERFLD_DOMAIN: domain
+        )
+      )
+    end
+
+    def user_execute_SET_PASSWORD(session_id:, username:, domain:, password:)
+      user_execute(
+        session_id: session_id,
+        cmd: 'USERCMD_SET_PASSWORD',
+        attributes: typed_attributes_list_from(
+          USERFLD_USERID: username,
+          USERFLD_DOMAIN: domain,
+          USERFLD_NEW_PASSWORD: password,
+          USERFLD_CONFIRM_NEW_PASSWORD: password
+        )
+      )
+    end
+
 
     # Executes a userQuery command that searches users. By default, it doesn't
     # log anywhere. To enable logging to a specific destination, pass a logger
