@@ -4,18 +4,18 @@ require 'bundler/setup'
 require 'identikey'
 
 Identikey::Authentication.configure do
-  wsdl ENV.fetch('WSDL_AUTH')
+  wsdl ENV.fetch('IK_WSDL_AUTH')
   endpoint ENV.fetch('IK_HOST')
 end
 
-puts "Configured Auth WSDL #{ENV.fetch('WSDL_AUTH')} against #{ENV.fetch('IK_HOST')}"
+puts "Configured Auth WSDL #{ENV.fetch('IK_WSDL_AUTH')} against #{ENV.fetch('IK_HOST')}"
 
 Identikey::Administration.configure do
-  wsdl ENV.fetch('WSDL_ADMIN')
+  wsdl ENV.fetch('IK_WSDL_ADMIN')
   endpoint ENV.fetch('IK_HOST')
 end
 
-puts "Configured Admin WSDL #{ENV.fetch('WSDL_ADMIN')} against #{ENV.fetch('IK_HOST')}"
+puts "Configured Admin WSDL #{ENV.fetch('IK_WSDL_ADMIN')} against #{ENV.fetch('IK_HOST')}"
 
 $ik = Identikey::Administration::Session.new(
   username: ENV.fetch('IK_USER'),

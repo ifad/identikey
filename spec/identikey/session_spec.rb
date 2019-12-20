@@ -1,7 +1,7 @@
 RSpec.describe Identikey::Administration::Session do
-  let(:username) { ENV.fetch('TEST_USERNAME') }
-  let(:password) { ENV.fetch('TEST_PASSWORD') }
-  let(:domain)   { ENV.fetch('TEST_DOMAIN', 'master') }
+  let(:username) { ENV.fetch('IK_USER') }
+  let(:password) { ENV.fetch('IK_PASS') }
+  let(:domain)   { ENV.fetch('IK_DOMAIN', 'master') }
 
   let(:session) { described_class.new username: username, password: password, domain: domain }
 
@@ -23,13 +23,13 @@ RSpec.describe Identikey::Administration::Session do
   describe '#endpoint' do
     subject { session.endpoint }
 
-    it { expect(subject).to eq(ENV['TEST_HOST']) }
+    it { expect(subject).to eq(ENV['IK_HOST']) }
   end
 
   describe '#wsdl' do
     subject { session.wsdl }
 
-    it { expect(subject).to eq(ENV['WSDL_ADMIN'] || './sdk/wsdl/administration.wsdl') }
+    it { expect(subject).to eq(ENV['IK_WSDL_ADMIN'] || './sdk/wsdl/administration.wsdl') }
   end
 
   describe '#logon' do

@@ -1,7 +1,7 @@
 RSpec.describe Identikey::Administration::SessionQuery do
-  username = ENV.fetch('TEST_USERNAME')
-  password = ENV.fetch('TEST_PASSWORD')
-  domain   = ENV.fetch('TEST_DOMAIN', 'master')
+  username = ENV.fetch('IK_USER')
+  password = ENV.fetch('IK_PASS')
+  domain   = ENV.fetch('IK_DOMAIN', 'master')
 
   session  = Identikey::Administration::Session.new \
     username: username, password: password, domain: domain

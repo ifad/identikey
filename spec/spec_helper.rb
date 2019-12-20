@@ -26,13 +26,13 @@ RSpec.configure do |config|
 
   config.before :suite do
     Identikey::Authentication.configure do
-      wsdl     ENV['WSDL_AUTH'] if ENV['WSDL_AUTH']
-      endpoint ENV['TEST_HOST'] if ENV['TEST_HOST']
+      wsdl     ENV['IK_WSDL_AUTH'] if ENV['IK_WSDL_AUTH']
+      endpoint ENV['IK_HOST']      if ENV['IK_HOST']
     end
 
     Identikey::Administration.configure do
-      wsdl     ENV['WSDL_ADMIN'] if ENV['WSDL_ADMIN']
-      endpoint ENV['TEST_HOST']  if ENV['TEST_HOST']
+      wsdl     ENV['IK_WSDL_ADMIN'] if ENV['IK_WSDL_ADMIN']
+      endpoint ENV['IK_HOST']       if ENV['IK_HOST']
     end
   end
 end
