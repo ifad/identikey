@@ -3,8 +3,27 @@
 require 'bundler/setup'
 require 'identikey'
 
-# You can add fixtures and/or initialization code here to make experimenting
-# with your gem easier. You can also use a different console, if you like.
+Identikey::Authentication.configure do
+  wsdl ENV.fetch('WSDL_AUTH')
+  endpoint ENV.fetch('IK_HOST')
+end
+
+puts "Configured Auth WSDL #{ENV.fetch('WSDL_AUTH')} against #{ENV.fetch('IK_HOST')}"
+
+Identikey::Administration.configure do
+  wsdl ENV.fetch('WSDL_ADMIN')
+  endpoint ENV.fetch('IK_HOST')
+end
+
+puts "Configured Admin WSDL #{ENV.fetch('WSDL_ADMIN')} against #{ENV.fetch('IK_HOST')}"
+
+$ik = Identikey::Administration::Session.new(
+  username: ENV.fetch('IK_USER'),
+  password: ENV.fetch('IK_PASS'),
+  domain:   ENV.fetch('IK_DOMAIN')
+)
+
+puts "Opened admin session with #{ENV.fetch('IK_USER')}@#{ENV.fetch('IK_DOMAIN')} against #{ENV.fetch('IK_HOST')}. Find it in $ik variable"
 
 require "pry"
 Pry.start
