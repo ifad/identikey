@@ -12,6 +12,7 @@ require 'dotenv'
 Dotenv.load 'spec/test.env'
 
 require 'identikey'
+require 'vacman_controller'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

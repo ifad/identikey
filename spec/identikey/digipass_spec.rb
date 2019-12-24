@@ -148,4 +148,59 @@ RSpec.describe Identikey::Administration::Digipass do
     end
   end
 
+  context do
+    let(:vacman_token) { VacmanController::Token.import(dpx_filename, transport_key).find {|t| t.serial == serial } }
+    let(:digipass)     { described_class.find(session: session, serial_no: serial) }
+
+    describe 'test_otp' do
+      let(:serial) { ENV.fetch('IK_UNASSIGNED_TOKEN_2_NUMBER') }
+      let(:dpx_filename)  { ENV.fetch('IK_UNASSIGNED_TOKEN_2_DPX') }
+      let(:transport_key) { ENV.fetch('IK_UNASSIGNED_TOKEN_2_TRANSPORT_KEY') }
+
+      let(:pin) { "%04d" % rand(10000) }
+
+      subject { digipass.test_otp(pin + vacman_token.generate) }
+
+      before { expect(digipass.set_pin(pin)).to be(true) }
+
+      it { expect(subject).to be(true) }
+    end
+
+    describe 'set_pin' do
+      subject { digipass.set_pin(pin) }
+
+      context 'given a valid PIN' do
+        let(:serial) { ENV.fetch('IK_UNASSIGNED_TOKEN_3_NUMBER') }
+        let(:dpx_filename)  { ENV.fetch('IK_UNASSIGNED_TOKEN_3_DPX') }
+        let(:transport_key) { ENV.fetch('IK_UNASSIGNED_TOKEN_3_TRANSPORT_KEY') }
+
+        let(:pin) { "%04d" % rand(10000) }
+
+        it { expect(subject).to be(true) }
+
+        after { expect(digipass.test_otp(pin + vacman_token.generate)).to be(true) }
+      end
+
+      context 'given an empty PIN' do
+        let(:serial) { ENV.fetch('IK_UNASSIGNED_TOKEN_4_NUMBER') }
+        let(:dpx_filename)  { ENV.fetch('IK_UNASSIGNED_TOKEN_4_DPX') }
+        let(:transport_key) { ENV.fetch('IK_UNASSIGNED_TOKEN_4_TRANSPORT_KEY') }
+
+        let(:pin) { '' }
+
+        it { expect(subject).to be(true) }
+
+        after { expect(digipass.test_otp(vacman_token.generate)).to be(true) }
+      end
+
+      context 'given a faulty PIN' do
+        let(:serial) { ENV.fetch('IK_UNASSIGNED_TOKEN_4_NUMBER') }
+
+        let(:pin) { 'foobarfof' }
+
+        it { expect { subject }.to raise_error(Identikey::OperationFailed).with_message(/STAT_DPERROR.*PIN Is Too Long/) }
+      end
+    end
+  end
+
 end
