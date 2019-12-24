@@ -24,6 +24,12 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  config.filter_run_when_matching :focus
+
+  config.example_status_persistence_file_path = "spec/examples.txt"
+
+  config.profile_examples = 5
+
   config.before :suite do
     Identikey::Authentication.configure do
       wsdl     ENV['IK_WSDL_AUTH'] if ENV['IK_WSDL_AUTH']
