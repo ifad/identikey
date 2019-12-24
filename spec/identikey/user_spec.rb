@@ -66,6 +66,15 @@ RSpec.describe Identikey::Administration::User do
 
       it { expect { subject }.to raise_error(Identikey::Error).with_message(/STAT_INVDATA/) }
     end
+
+    context 'for users with no description' do
+      let(:query) { {description: nil} }
+      let(:options) { {limit: 1} }
+
+      it { expect { subject }.to_not raise_error }
+      it { expect(subject).to be_a(Array) }
+      it { expect(subject.size).to be >= 0 }
+    end
   end
 
   describe '.save' do

@@ -68,6 +68,38 @@ RSpec.describe Identikey::Administration::Digipass do
 
       it { expect { subject }.to raise_error(Identikey::Error).with_message(/STAT_INVDATA/) }
     end
+
+    context 'when requesting a search with offset' do
+      let(:query) { {status: 'Assigned', serial: ENV.fetch('IK_ASSIGNED_TOKEN_1_NUMBER')} }
+      let(:options) { {offset: 1} }
+
+      it { expect(subject).to be_a(Array) }
+      it { expect(subject.size).to eq(0) }
+    end
+
+    context 'when requesting a search with limit' do
+      let(:query) { {status: 'Unassigned'} }
+      let(:options) { {limit: 2} }
+
+      it { expect(subject).to be_a(Array) }
+      it { expect(subject.size).to eq(2) }
+    end
+
+    context 'when requesting a search with limit and offset' do
+      let(:query) { {status: 'Unassigned'} }
+      let(:options) { {offset: 1, limit: 1} }
+
+      it { expect(subject).to be_a(Array) }
+      it { expect(subject.size).to eq(1) }
+    end
+
+    context 'when requesting a search with distinct' do
+      let(:query) { {status: 'Unassigned'} }
+      let(:options) { {limit: 2, distinct: true} }
+
+      it { expect(subject).to be_a(Array) }
+      it { expect(subject.size).to eq(2) }
+    end
   end
 
   describe '.assigned?' do
