@@ -158,6 +158,15 @@ RSpec.describe Identikey::Administration::User do
 
     it { expect { subject }.to_not raise_error } # Moot, I know.
 
+    context do
+      before { user.set_password! 'Frupper.1' }
+      before { Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1') }
+      before { subject }
+
+      it { expect { Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1') }.to \
+           raise_error(Identikey::OperationFailed).with_message(/STAT_LOCAL_PASSWORD_MISMATCH/) }
+    end
+
     after { user.destroy! }
   end
 
@@ -177,6 +186,11 @@ RSpec.describe Identikey::Administration::User do
     ).save! }
 
     it { expect { subject }.to_not raise_error } # Moot, I know.
+
+    context do
+      before { subject }
+      it { expect(Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1')).to be(true) }
+    end
 
     after { user.destroy! }
   end
