@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'dotenv'
   spec.add_development_dependency 'guard-rspec'
   spec.add_development_dependency 'vacman_controller'
+  spec.add_development_dependency 'code_counter'
 end

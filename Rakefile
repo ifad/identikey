@@ -6,3 +6,9 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
 end
 
 task :default => :spec
+
+require 'code_counter/engine'
+desc 'Print code statistics'
+task :stats do
+  puts CodeCounter::Engine.new.to_s
+end
