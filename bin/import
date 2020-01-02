@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'identikey'
+require 'json'
+
+if ARGV.size != 1
+  $stderr.puts "Usage: #{$0} <users.json>"
+  exit 1
+end
+
+Identikey::Administration.configure do
+  wsdl ENV.fetch('IK_WSDL_ADMIN')
+  endpoint ENV.fetch('IK_HOST')
+end
+
+puts "Configured Admin WSDL #{ENV.fetch('IK_WSDL_ADMIN')} against #{ENV.fetch('IK_HOST')}"
+
+$ik = Identikey::Administration::Session.new(
+  username: ENV.fetch('IK_USER'),
+  password: ENV.fetch('IK_PASS'),
+  domain:   ENV.fetch('IK_DOMAIN')
+)
+
+$ik.logon
+
+puts "Opened admin session with #{ENV.fetch('IK_USER')}@#{ENV.fetch('IK_DOMAIN')} against #{ENV.fetch('IK_HOST')}"
+
+at_exit { $ik.logoff }
+
+users = JSON.load File.read ARGV[0]
+
+users.each do |import|
+
+  puts "Looking up #{import['username']}"
+  ik_user = begin
+    Identikey::Administration::User.find(session: $ik, username: import['username'], domain: ENV.fetch('IK_DOMAIN'))
+  rescue => e
+    puts "Cannot look up #{import['username']}: #{e.message}"
+    nil
+  end
+
+  unless ik_user
+    puts "User #{import['username']} not found, creating"
+
+    ik_user = Identikey::Administration::User.new($ik,
+      'USERFLD_USERID'          => import['username'],
+      'USERFLD_EMAIL'           => import['email'],
+      'USERFLD_DOMAIN'          => ENV.fetch('IK_DOMAIN'),
+      'USERFLD_LOCAL_AUTH'      => 'Default',
+      'USERFLD_BACKEND_AUTH'    => 'Default',
+      'USERFLD_DISABLED'        => import['disabled'],
+      'USERFLD_LOCKED'          => import['locked'],
+      'USERFLD_EXPIRATION_TIME' => import['expires_at']
+    )
+
+    begin
+      ik_user.save!
+      puts "User #{import['username']} created"
+    rescue => e
+
+      puts "Cannot create #{import['username']}: #{e.message}"
+
+      next
+    end
+  end
+
+  missing_digipass = import['digipass'] - ik_user.digipass
+
+  missing_digipass.each do |digipass|
+    puts "Assigining digipass #{digipass} to #{import['username']}"
+
+    ik_token = begin
+      Identikey::Administration::Digipass.find(session: $ik, serial_no: digipass)
+    rescue => e
+      puts "Digipass #{digipass} was not found"
+      next
+    end
+
+    begin
+      ik_token.assign! import['username'], ENV.fetch('IK_DOMAIN')
+    rescue => e
+      puts "Digipass #{digipass} could not be assigned to #{import['username']}: #{e.message}"
+    end
+
+    puts "Assignment of digipass #{digipass} to #{import['username']} was successful"
+  end
+
+end
