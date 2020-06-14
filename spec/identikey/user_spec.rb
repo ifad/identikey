@@ -204,4 +204,28 @@ RSpec.describe Identikey::Administration::User do
     after { user.destroy! }
   end
 
+  describe 'unlock!' do
+    subject { user.unlock! }
+
+    let!(:user) { described_class.new(
+      session,
+      'USERFLD_USERID'       => 'ik.test',
+      'USERFLD_EMAIL'        => 'ik.test@example.com',
+      'USERFLD_DOMAIN'       => domain,
+      'USERFLD_LOCAL_AUTH'   => 'Default',
+      'USERFLD_BACKEND_AUTH' => 'Default',
+      'USERFLD_DISABLED'     => false,
+      'USERFLD_LOCKED'       => true,
+    ).save! }
+
+    # Lock it
+    before { 3.times { Identikey::Authentication.valid_otp?(user.username, user.domain, 'foobar') } }
+
+    # Unlock it
+    it { expect { subject }.to change { user.reload.locked }.from(true).to(false) }
+
+    after { user.destroy! }
+
+  end
+
 end

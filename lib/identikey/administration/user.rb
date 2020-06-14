@@ -157,6 +157,21 @@ module Identikey
         true
       end
 
+      def unlock!
+        ensure_persisted!
+
+        stat, _, error = @session.execute(
+          :user_execute_UNLOCK, username: username, domain: domain)
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::OperationFailed, "Unlock user #{self.username} failed: #{stat} - #{error}"
+        end
+
+        self.locked = false
+
+        true
+      end
+
       protected
         def replace(user, persisted: false)
           self.username             = user['USERFLD_USERID']

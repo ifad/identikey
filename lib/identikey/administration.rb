@@ -169,6 +169,16 @@ module Identikey
       )
     end
 
+    def user_execute_UNLOCK(session_id:, username:, domain:)
+      user_execute(
+        session_id: session_id,
+        cmd: 'USERCMD_UNLOCK',
+        attributes: typed_attributes_list_from(
+          USERFLD_USERID: username,
+          USERFLD_DOMAIN: domain
+        )
+      )
+    end
 
     # Executes a userQuery command that searches users. By default, it doesn't
     # log anywhere. To enable logging to a specific destination, pass a logger
