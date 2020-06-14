@@ -275,8 +275,8 @@ module Identikey
           when Integer
             [ 'xsd:int', value.to_s ]
 
-          when DateTime, Time
-            [ 'xsd:datetime', value.utc.iso8601 ]
+          when Time
+            [ 'xsd:dateTime', value.utc.iso8601 ]
 
           when TrueClass, FalseClass
             [ 'xsd:boolean', value.to_s ]
