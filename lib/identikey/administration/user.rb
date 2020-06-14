@@ -34,7 +34,7 @@ module Identikey
         )
 
         case stat
-        when 'STAT_SUCCESS'   then (users||[]).map {|user| new(session, user) }
+        when 'STAT_SUCCESS'   then (users||[]).map {|user| new(session, user, persisted: true) }
         when 'STAT_NOT_FOUND' then []
         else
           raise Identikey::Error, "Search user failed: #{stat} - #{error}"
@@ -62,10 +62,10 @@ module Identikey
       attr_accessor :last_auth_attempt_at
       attr_accessor :description
 
-      def initialize(session, user = nil)
+      def initialize(session, user = nil, persisted: false)
         @session = session
 
-        replace(user) if user
+        replace(user, persisted: persisted) if user
       end
 
       def find(username, domain)
