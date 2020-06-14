@@ -6,7 +6,7 @@ module Identikey
         new(session).find(username, domain)
       end
 
-      def self.search(session:, query:, options: {})
+      def self.search(session:, query:, options: {}, log: false)
         [:has_digipass, :not_has_digipass].each do |funky_boolean|
           if query.key?(funky_boolean) && [true, false].include?(query[funky_boolean])
             query[funky_boolean] = query[funky_boolean] ? 'Assigned' : 'Unassigned'
@@ -29,7 +29,9 @@ module Identikey
 
         stat, users, error = session.execute(:user_query,
           attributes:    Base.search_attributes_from(query, attribute_map: query_keys),
-          query_options: Base.search_options_from(options))
+          query_options: Base.search_options_from(options),
+          log:           log
+        )
 
         case stat
         when 'STAT_SUCCESS'   then (users||[]).map {|user| new(session, user) }
