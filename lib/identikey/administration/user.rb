@@ -64,6 +64,10 @@ module Identikey
       attr_accessor :passwd_last_set_at
       attr_accessor :has_password
 
+      alias locked? locked
+      alias digipass? has_digipass
+      alias password? has_password
+
       def initialize(session, user = nil, persisted: false)
         @session = session
 
