@@ -264,8 +264,8 @@ module Identikey
           parse = /^(not_)?(.*)/i.match(full_name.to_s)
           name  = parse[2]
 
-          options = []
-          options.push(negative: true) if !parse[1].nil?
+          options = {}
+          options[:negative] = true if !parse[1].nil?
 
           type, value = case value
 
@@ -285,7 +285,7 @@ module Identikey
             [ 'xsd:string', value.to_s ]
 
           when NilClass
-            options.push(null: true)
+            options[:null] = true
             [ 'xsd:string', '' ]
 
           else
