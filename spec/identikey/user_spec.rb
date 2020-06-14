@@ -162,10 +162,11 @@ RSpec.describe Identikey::Administration::User do
       'USERFLD_BACKEND_AUTH' => 'Default',
       'USERFLD_DISABLED'     => false,
       'USERFLD_LOCKED'       => false,
-      'USERFLD_PASSWORD'     => 'foobar',
     ).save! }
 
-    it { expect { subject }.to_not raise_error } # Moot, I know.
+    before { user.set_password!('NothingToSeeHere.1') }
+
+    it { expect { subject }.to change { user.reload.has_password }.from(true).to(false) }
 
     context do
       before { user.set_password! 'Frupper.1' }
@@ -191,10 +192,9 @@ RSpec.describe Identikey::Administration::User do
       'USERFLD_BACKEND_AUTH' => 'Default',
       'USERFLD_DISABLED'     => false,
       'USERFLD_LOCKED'       => false,
-      'USERFLD_PASSWORD'     => 'foobar',
     ).save! }
 
-    it { expect { subject }.to_not raise_error } # Moot, I know.
+    it { expect { subject }.to change { user.reload.has_password }.from(false).to(true) }
 
     context do
       before { subject }

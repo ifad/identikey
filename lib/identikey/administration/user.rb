@@ -61,6 +61,8 @@ module Identikey
       attr_accessor :expired
       attr_accessor :last_auth_attempt_at
       attr_accessor :description
+      attr_accessor :passwd_last_set_at
+      attr_accessor :has_password
 
       def initialize(session, user = nil, persisted: false)
         @session = session
@@ -135,6 +137,8 @@ module Identikey
           raise Identikey::OperationFailed, "Clear user #{self.username} password failed: #{stat} - #{error}"
         end
 
+        self.has_password = false
+
         true
       end
 
@@ -147,6 +151,8 @@ module Identikey
         if stat != 'STAT_SUCCESS'
           raise Identikey::OperationFailed, "Set user #{self.username} password failed: #{stat} - #{error}"
         end
+
+        self.has_password = true
 
         true
       end
@@ -173,6 +179,8 @@ module Identikey
           self.expired              = user['USERFLD_EXPIRED']
           self.last_auth_attempt_at = user['USERFLD_LASTAUTHREQ_TIME']
           self.description          = user['USERFLD_DESCRIPTION']
+          self.passwd_last_set_at   = user['USERFLD_LAST_PASSWORD_SET_TIME']
+          self.has_password         = !user['USERFLD_PASSWORD'].nil?
 
           @persisted = persisted
 
