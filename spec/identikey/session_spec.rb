@@ -10,13 +10,19 @@ RSpec.describe Identikey::Administration::Session do
 
     context 'given correct credentials' do
       it { expect { subject }.to_not raise_error }
+
       it { expect(subject.sid).to be(nil) }
+      it { expect(subject.logged_on?).to be(false) }
+      it { expect(subject.service_user?).to be(false) }
     end
 
     context 'given invalid credentials' do
       let(:username) { 'bogus' }
 
       it { expect { subject }.to_not raise_error }
+
+      it { expect(subject.logged_on?).to be(false) }
+      it { expect(subject.service_user?).to be(false) }
     end
   end
 

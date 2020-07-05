@@ -6,12 +6,21 @@ module Identikey
       attr_reader :session_id, :product, :version
       attr_reader :privileges, :location
 
-      def initialize(username:, password:, domain: 'master')
+      def initialize(username:, password: nil, apikey: nil, domain: 'master')
+        if password.nil? && apikey.nil?
+          raise Identikey::UsageError, "Either a password or an API Key is required"
+        end
+
         @client = Identikey::Administration.new
 
         @username = username
         @password = password
         @domain   = domain
+
+        if apikey
+          @service_user = true
+          @session_id = "Apikey #{username}:#{apikey}"
+        end
       end
 
       def endpoint
@@ -23,6 +32,8 @@ module Identikey
       end
 
       def logon
+        require_classic_user!
+
         stat, sess, error = @client.logon(username: @username, password: @password, domain: @domain)
 
         if stat != 'STAT_SUCCESS'
@@ -42,6 +53,7 @@ module Identikey
       end
 
       def logoff
+        require_classic_user!
         require_logged_on!
 
         stat, _, error = @client.logoff session_id: @session_id
@@ -60,6 +72,8 @@ module Identikey
       end
 
       def alive?(log: true)
+        require_classic_user!
+
         return false unless logged_on?
 
         stat, _ = @client.ping session_id: @session_id, log: log
@@ -108,7 +122,17 @@ module Identikey
       end
 
       def inspect
-        "#<#{self.class.name} sid=#@session_id username=#@username domain=#@domain product=#@product>"
+        descr = if service_user?
+          "SERVICE USER"
+        else
+          "domain=#@domain product=#@product"
+        end
+
+        "#<#{self.class.name} sid=#@session_id username=#@username #{descr}>"
+      end
+
+      def service_user?
+        !!@service_user
       end
 
       alias sid session_id
@@ -120,6 +144,12 @@ module Identikey
       def require_logged_on!
         unless logged_on?
           raise Identikey::UsageError, "Session is not logged on at the moment"
+        end
+      end
+
+      def require_classic_user!
+        if service_user?
+          raise Identikey::UsageError, "This command is not supported with Service users"
         end
       end
 
