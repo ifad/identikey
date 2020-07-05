@@ -9,7 +9,7 @@ require 'byebug'
 
 require 'dotenv'
 # Load environment variables.
-Dotenv.load 'spec/test.env'
+Dotenv.overload 'spec/test.env'
 
 require 'identikey'
 require 'vacman_controller'
