@@ -6,11 +6,13 @@ module Identikey
 
     operations :auth_user
 
-    def auth_user(user, domain, otp)
+    def auth_user(user, domain, otp, client = nil)
+      client ||= 'Administration Program'
+
       resp = super(message: {
         credentialAttributeSet: {
           attributes: typed_attributes_list_from(
-            CREDFLD_COMPONENT_TYPE: 'Administration Program',
+            CREDFLD_COMPONENT_TYPE: client,
             CREDFLD_USERID: user,
             CREDFLD_DOMAIN: domain,
             CREDFLD_PASSWORD_FORMAT: Unsigned(0),
@@ -22,13 +24,13 @@ module Identikey
       parse_response resp, :auth_user_response
     end
 
-    def self.valid_otp?(user, domain, otp)
-      status, result, _ = new.auth_user(user, domain, otp)
+    def self.valid_otp?(user, domain, otp, client = nil)
+      status, result, _ = new.auth_user(user, domain, otp, client)
       return otp_validated_ok?(status, result)
     end
 
-    def self.validate!(user, domain, otp)
-      status, result, error_stack = new.auth_user(user, domain, otp)
+    def self.validate!(user, domain, otp, client = nil)
+      status, result, error_stack = new.auth_user(user, domain, otp, client)
 
       if otp_validated_ok?(status, result)
         return true

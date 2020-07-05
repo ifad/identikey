@@ -69,4 +69,54 @@ RSpec.describe Identikey::Authentication do
       end
     end
   end
+
+  context do
+    subject { Identikey::Authentication.validate!(user, domain, pass, client) }
+
+    context 'given an otp-only policy' do
+      let(:client) { ENV.fetch('IK_DIGIPASS_ONLY_CLIENT') }
+
+      context 'and an user authenticating with password' do
+        let(:user) { ENV.fetch('IK_STATIC_PASSWORD_USER') }
+        let(:pass) { ENV.fetch('IK_STATIC_PASSWORD_PASS') }
+
+        it { expect { subject }.to raise_error(Identikey::OperationFailed).with_message(/GRACE_PERIOD_EXPIRED/) }
+      end
+
+      context 'and an user authenticating with OTP' do
+        let(:dpx_filename)  { ENV.fetch('IK_ASSIGNED_TOKEN_3_DPX') }
+        let(:transport_key) { ENV.fetch('IK_ASSIGNED_TOKEN_3_TRANSPORT_KEY') }
+        let(:serial)        { ENV.fetch('IK_ASSIGNED_TOKEN_3_NUMBER') }
+        let(:vacman_token)  { VacmanController::Token.import(dpx_filename, transport_key).find {|t| t.serial == serial } }
+
+        let(:user) { ENV.fetch('IK_ASSIGNED_TOKEN_3_PERSON') }
+        let(:pass) { ENV.fetch('IK_ASSIGNED_TOKEN_3_PIN') + vacman_token.generate }
+
+        it { expect { subject }.to_not raise_error }
+      end
+    end
+
+    context 'given a password-permitted policy' do
+      let(:client) { ENV.fetch('IK_STATIC_PASSWORD_CLIENT') }
+
+      context 'and an user authenticating with password' do
+        let(:user) { ENV.fetch('IK_STATIC_PASSWORD_USER') }
+        let(:pass) { ENV.fetch('IK_STATIC_PASSWORD_PASS') }
+
+        it { expect { subject }.to_not raise_error }
+      end
+
+      context 'and an user authenticating with OTP' do
+        let(:dpx_filename)  { ENV.fetch('IK_ASSIGNED_TOKEN_4_DPX') }
+        let(:transport_key) { ENV.fetch('IK_ASSIGNED_TOKEN_4_TRANSPORT_KEY') }
+        let(:serial)        { ENV.fetch('IK_ASSIGNED_TOKEN_4_NUMBER') }
+        let(:vacman_token)  { VacmanController::Token.import(dpx_filename, transport_key).find {|t| t.serial == serial } }
+
+        let(:user) { ENV.fetch('IK_ASSIGNED_TOKEN_4_PERSON') }
+        let(:pass) { ENV.fetch('IK_ASSIGNED_TOKEN_4_PIN') + vacman_token.generate }
+
+        it { expect { subject }.to_not raise_error }
+      end
+    end
+  end
 end
