@@ -1,8 +1,9 @@
 RSpec.describe Identikey::Authentication do
   let(:domain) { ENV.fetch('IK_DOMAIN') }
+  let(:client) { ENV.fetch('IK_CLIENT') }
 
   describe '.validate!' do
-    subject { Identikey::Authentication.validate!(user, domain, otp) }
+    subject { Identikey::Authentication.validate!(user, domain, otp, client) }
 
     context 'given an user with no tokens assigned'  do
       let(:user) { ENV.fetch('IK_UNASSIGNED_TOKEN_PERSON') }
@@ -40,7 +41,7 @@ RSpec.describe Identikey::Authentication do
   end
 
   describe 'valid_otp?' do
-    subject { Identikey::Authentication.valid_otp?(user, domain, otp) }
+    subject { Identikey::Authentication.valid_otp?(user, domain, otp, client) }
 
     context 'given an user with a token assigned' do
       let(:user) { ENV.fetch('IK_ASSIGNED_TOKEN_2_PERSON') }

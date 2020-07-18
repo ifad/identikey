@@ -2,6 +2,7 @@ RSpec.describe Identikey::Administration::User do
   username = ENV.fetch('IK_USER')
   password = ENV.fetch('IK_PASS')
   domain   = ENV.fetch('IK_DOMAIN', 'master')
+  client   = ENV.fetch('IK_CLIENT')
   session  = Identikey::Administration::Session.new username: username, password: password, domain: domain
 
   before(:all) { session.logon }
@@ -170,10 +171,10 @@ RSpec.describe Identikey::Administration::User do
 
     context do
       before { user.set_password! 'Frupper.1' }
-      before { Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1') }
+      before { Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1', client) }
       before { subject }
 
-      it { expect { Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1') }.to \
+      it { expect { Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1', client) }.to \
            raise_error(Identikey::OperationFailed).with_message(/STAT_LOCAL_PASSWORD_MISMATCH/) }
     end
 
@@ -198,7 +199,7 @@ RSpec.describe Identikey::Administration::User do
 
     context do
       before { subject }
-      it { expect(Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1')).to be(true) }
+      it { expect(Identikey::Authentication.validate!('ik.test', domain, 'Frupper.1', client)).to be(true) }
     end
 
     after { user.destroy! }
@@ -219,7 +220,7 @@ RSpec.describe Identikey::Administration::User do
     ).save! }
 
     # Lock it
-    before { 3.times { Identikey::Authentication.valid_otp?(user.username, user.domain, 'foobar') } }
+    before { 3.times { Identikey::Authentication.valid_otp?(user.username, user.domain, 'foobar', client) } }
 
     # Unlock it
     it { expect { subject }.to change { user.reload.locked }.from(true).to(false) }
