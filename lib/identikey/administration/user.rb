@@ -161,6 +161,16 @@ module Identikey
         true
       end
 
+      def set_local_auth!(value)
+        ensure_persisted!
+
+        self.local_auth = value
+
+        self.save!
+
+        self
+      end
+
       def unlock!
         ensure_persisted!
 

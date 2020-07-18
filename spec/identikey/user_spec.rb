@@ -205,6 +205,48 @@ RSpec.describe Identikey::Administration::User do
     after { user.destroy! }
   end
 
+  describe 'set_local_auth!' do
+    subject { user.set_local_auth! local_auth }
+
+    let!(:user) { described_class.new(
+      session,
+      'USERFLD_USERID'       => 'ik.test',
+      'USERFLD_EMAIL'        => 'ik.test@example.com',
+      'USERFLD_DOMAIN'       => domain,
+      'USERFLD_LOCAL_AUTH'   => 'Digipass Only',
+      'USERFLD_BACKEND_AUTH' => 'Default',
+      'USERFLD_DISABLED'     => false,
+      'USERFLD_LOCKED'       => false,
+    ).save! }
+
+    let(:authenticate) { -> { Identikey::Authentication.valid_otp?(user.username, user.domain, password, client) } }
+
+    context 'when allowing digipass and password' do
+      let(:local_auth) { 'DIGIPASS or Password' }
+      let(:password) { 'Lallero.3' }
+
+      before { user.set_password! password }
+
+      it { expect { subject }.to change { user.reload.local_auth }.from('Digipass Only').to(local_auth) }
+
+      it do
+        expect(authenticate.call).to be(false)
+
+        subject
+
+        expect(authenticate.call).to be(true)
+      end
+    end
+
+    context 'when passing an invalid value' do
+      let(:local_auth) { 'Lallero' }
+
+      it { expect { subject }.to raise_error(Identikey::OperationFailed).with_message(/STAT_INVDATA/) }
+    end
+
+    after { user.destroy! }
+  end
+
   describe 'unlock!' do
     subject { user.unlock! }
 
