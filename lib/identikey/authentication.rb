@@ -35,7 +35,7 @@ module Identikey
       if otp_validated_ok?(status, result)
         return true
       else
-        error_message = result['CREDFLD_STATUS_MESSAGE']
+        error_message = result ? result['CREDFLD_STATUS_MESSAGE'] : 'no status returned'
         raise Identikey::OperationFailed.new("OTP Validation error (#{status}): #{error_message}", error_stack)
       end
     end
