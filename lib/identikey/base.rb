@@ -129,8 +129,6 @@ module Identikey
       # formats. TODO maybe create a separate class for errors, that includes
       # the error code.
       #
-      # TODO refactor and split in separate methods
-      #
       def parse_response(resp, root_element)
         body = resp.body
 
@@ -161,23 +159,29 @@ module Identikey
 
         results = root[:results]
 
-        # Result code
-        #
+        result_code       = parse_result_code(results)
+        result_attributes = parse_result_attributes(results)
+        result_errors     = parse_result_errors(results)
+
+        return result_code, result_attributes, result_errors
+      end
+
+      def parse_result_code(results)
         unless results.key?(:result_codes)
           raise Identikey::ParseError, "Result codes not found below #{root_element}"
         end
 
-        result_code = results[:result_codes][:status_code_enum] || 'STAT_UNKNOWN'
+        results[:result_codes][:status_code_enum] || 'STAT_UNKNOWN'
+      end
 
-        # Result attributes
-        #
+      def parse_result_attributes(results)
         unless results.key?(:result_attribute)
           raise Identikey::ParseError, "Result attribute not found below #{root_element}"
         end
 
         results_attr = results[:result_attribute]
 
-        result_attributes = if results_attr.key?(:attributes)
+        if results_attr.key?(:attributes)
           entries = [ results_attr[:attributes] ].flatten
           parse_attributes entries
 
@@ -193,16 +197,14 @@ module Identikey
         else
           nil
         end
+      end
 
-        # Errors
-        #
-        errors = if results[:error_stack].key?(:errors)
+      def parse_result_errors(results)
+        if results[:error_stack].key?(:errors)
           parse_errors results[:error_stack][:errors]
         else
           nil
         end
-
-        return result_code, result_attributes, errors
       end
 
       def parse_attributes(attributes)
