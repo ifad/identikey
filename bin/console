@@ -17,6 +17,13 @@ end
 
 puts "Configured Admin WSDL #{ENV.fetch('IK_WSDL_ADMIN')} against #{ENV.fetch('IK_HOST')}"
 
+Identikey::Provisioning.configure do
+  wsdl ENV.fetch('IK_WSDL_PROVN')
+  endpoint ENV.fetch('IK_HOST')
+end
+
+puts "Configured Provisioning WSDL #{ENV.fetch('IK_WSDL_PROVN')} against #{ENV.fetch('IK_HOST')}"
+
 $ik = Identikey::Administration::Session.new(
   username: ENV.fetch('IK_USER'),
   password: ENV.fetch('IK_PASS'),
