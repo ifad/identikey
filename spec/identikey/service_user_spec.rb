@@ -69,7 +69,7 @@ RSpec.describe Identikey::Administration::Session do
     subject { session.execute :admin_session_query }
 
     it { expect { subject }.to_not raise_error }
-    it { expect(subject.first).to eq('STAT_SUCCESS') }
+    it { expect(subject.first).to eq('STAT_USER_UNKNOWN') }
   end
 
 end
