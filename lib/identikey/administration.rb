@@ -18,6 +18,10 @@ module Identikey
       :admin_session_query, :user_execute, :user_query,
       :digipass_execute, :digipass_query, :digipassappl_execute
 
+    ###
+    ## LOGON/LOGOFF/PING
+    ###
+
     def logon(username:, password:, domain:)
       resp = super(message: {
         attributeSet: {
@@ -94,6 +98,10 @@ module Identikey
 
       parse_response resp, :admin_session_query_response
     end
+
+    ###
+    ## USER_EXECUTE
+    ###
 
     def user_execute(session_id:, cmd:, attributes: [])
       resp = super(message: {
@@ -180,6 +188,10 @@ module Identikey
       )
     end
 
+    ###
+    ## USER_QUERY
+    ###
+
     # Executes a userQuery command that searches users. By default, it doesn't
     # log anywhere. To enable logging to a specific destination, pass a logger
     # as the log: option. To log to the default destination, pass `true` as
@@ -199,6 +211,9 @@ module Identikey
       end
     end
 
+    ###
+    ## DIGIPASS_EXECUTE
+    ###
 
     def digipass_execute(session_id:, cmd:, attributes: [])
       resp = super(message: {
@@ -245,6 +260,9 @@ module Identikey
       )
     end
 
+    ###
+    ## DIGIPASS_QUERY
+    ###
 
     def digipass_query(session_id:, attributes:, query_options:)
       resp = super(message: {
@@ -258,6 +276,9 @@ module Identikey
       parse_response resp, :digipass_query_response
     end
 
+    ###
+    ## DIGIPASSAPPL_EXECUTE
+    ###
 
     def digipassappl_execute(session_id:, cmd:, attributes:)
       resp = super(message: {
@@ -313,7 +334,6 @@ module Identikey
       ensure
         client.globals[:log] = old_log
       end
-
 
   end
 end
