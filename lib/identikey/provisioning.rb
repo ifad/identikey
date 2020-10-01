@@ -55,6 +55,34 @@ module Identikey
       parse_response resp, :dsapp_srp_register_response
     end
 
+    ###
+    ## Wraps dsapp_srp_register and returns directly the activation
+    ## message through which a CRONTO image can be generated, to be
+    ## used for push notifications setups in combination with a MDC
+    ## configured on your OneSpan control panel and on Identikey.
+    ####
+    def dsapp_srp_cronto_push(gateway:, **kwargs)
+      status, result, error = self.dsapp_srp_register(**kwargs)
+
+      if status != 'STAT_SUCCESS'
+        raise Identikey::OperationFailed, "Error while assigning DAL: #{status} - #{[error].flatten.join('; ')}"
+      end
+
+      # Compose proprietary string
+      message = '01;01;%s;%s;%s;%s;%s' % [
+        result[:user][:user_id],
+        result[:user][:domain],
+        result[:registration_id],
+        result[:activation_password],
+        gateway
+      ]
+
+      puts message
+
+      # Encode it as hex
+      return message.split(//).map {|c| '%x' % c.ord}.join
+    end
+
     protected
       # The provisioningExecute command has the same
       # design as the rest of the API, with a single
