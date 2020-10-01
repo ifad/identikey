@@ -54,5 +54,16 @@ module Identikey
     def self.otp_validated_ok?(status, result)
       status == 'STAT_SUCCESS' && !result.key?('CREDFLD_STATUS_MESSAGE')
     end
+
+
+    protected
+      def parse_result_root(body, root_element)
+        root = super
+
+        # The authentication API wraps the results with another element
+        #
+        results_key = root_element.to_s.sub(/_response$/, '_results').to_sym
+        return root[results_key]
+      end
   end
 end

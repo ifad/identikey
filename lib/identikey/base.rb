@@ -100,7 +100,7 @@ module Identikey
 
       # Parse the generic response types that the API returns.
       #
-      # The returned attributes (up to now...) are always:
+      # The returned attributes in the Administration API are:
       #
       # - The given root element, whose name is derived from the SOAP command
       #   that was invoked
@@ -110,6 +110,11 @@ module Identikey
       #   - :result_attribute, that may either contain a single attributes list
       #      or multiple ones.
       #   - :error_stack, a list of error that occurred
+      #
+      # The authentication API wraps the results element in another one
+      #
+      # The provisioning API uses a status element for the result code and
+      # error stack, and a result element for the results.
       #
       # The returned value is a three-elements array, containing:
       #
@@ -130,8 +135,18 @@ module Identikey
       # the error code.
       #
       def parse_response(resp, root_element)
-        body = resp.body
+        root = parse_result_root(resp.body, root_element)
 
+        results = parse_result_element(root, root_element)
+
+        result_code       = parse_result_code(results, root_element)
+        result_attributes = parse_result_attributes(results, root_element)
+        result_errors     = parse_result_errors(results, root_element)
+
+        return result_code, result_attributes, result_errors
+      end
+
+      def parse_result_root(body, root_element)
         if body.size.zero?
           raise Identikey::ParseError, "Empty response received"
         end
@@ -142,31 +157,20 @@ module Identikey
 
         # The root results element
         #
-        root = body[root_element]
+        return body[root_element]
+      end
 
-        # ... that the authentication API wraps with another element
-        #
-        results_key = root_element.to_s.sub(/_response$/, '_results').to_sym
-        if root.keys.size == 1 && root.key?(results_key)
-          root = root[results_key]
-        end
-
+      def parse_result_element(root, root_element)
         # The results element
         #
         unless root.key?(:results)
           raise Identikey::ParseError, "Results element not found below #{root_element}"
         end
 
-        results = root[:results]
-
-        result_code       = parse_result_code(results)
-        result_attributes = parse_result_attributes(results)
-        result_errors     = parse_result_errors(results)
-
-        return result_code, result_attributes, result_errors
+        return root[:results]
       end
 
-      def parse_result_code(results)
+      def parse_result_code(results, root_element)
         unless results.key?(:result_codes)
           raise Identikey::ParseError, "Result codes not found below #{root_element}"
         end
@@ -174,7 +178,7 @@ module Identikey
         results[:result_codes][:status_code_enum] || 'STAT_UNKNOWN'
       end
 
-      def parse_result_attributes(results)
+      def parse_result_attributes(results, root_element)
         unless results.key?(:result_attribute)
           raise Identikey::ParseError, "Result attribute not found below #{root_element}"
         end
@@ -199,7 +203,7 @@ module Identikey
         end
       end
 
-      def parse_result_errors(results)
+      def parse_result_errors(results, root_element)
         if results[:error_stack].key?(:errors)
           parse_errors results[:error_stack][:errors]
         else
