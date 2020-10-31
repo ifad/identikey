@@ -1,6 +1,6 @@
 # Identikey
 
-This library is a thin yet incomplete wrapper of the VASCO Identikey SOAP API.
+This library is a thin yet featureful wrapper of the VASCO Identikey SOAP API.
 
 Vasco Identikey has been recently re-branded as OneSpan Authentication Server.
 
