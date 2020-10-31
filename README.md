@@ -25,6 +25,49 @@ And then execute:
 
     $ bundle
 
+## Features
+
+This client implements the Authentication, Administration and Provisioning
+SOAP APIs.
+
+### Authentication
+
+* `auth\_user`: end user authentication with OTP / static password / back-end
+
+
+### Administration
+
+* `logon` / `logoff`: log on or log off an administrative session.
+  You are advised to use a connection pool ([such as
+  mperham's](https://github.com/mperham/connection_pool)) to keep multiple
+  instances of administration sessions alive. This gem is used in production
+  with puma, and has been extensively tested so it is thread-safe.
+
+* `alive?`: checks whether an administrative session is alive. You can use
+  `.logon` again when `.alive?` returns `false`.
+
+* `admin\_session\_query`: returns active admin sessions
+
+* `user\_execute`: `view`, `create`, `update`, `delete`, `reset\_password`,
+  `set\_password`, and `unlock` user accounts.
+
+* `user\_query`: search for users
+
+* `digipass\_execute`: `view`, `assign`, `unassign` digipasses
+
+* `digipass\_query`: search for digipasses
+
+* `digipassappl\_execute`: `test\_otp`, `set\_pin` on applicable digipasses
+
+
+### Provisioning
+
+* `provisioning\_execute`: `mdl\_register`, `dsapp\_srp\_register`. bonus:
+  generation of CRONTO images for online activation, for use with the push
+  notification gateways. You can use [this gem](https://github.com/ifad/cronto)
+  to generate the PNG to serve to your users.
+
+
 ## Configuration
 
 By default the client expects WSDL files in the current working directory,
@@ -53,7 +96,14 @@ Identikey::Authentication.configure do
 end
 
 Identikey::Administration.configure do
-  wsdl     './path/to/your/administrtaion.wsdl'
+  wsdl     './path/to/your/administrtation.wsdl'
+  endpoint 'https://your-identikey.example.com:8888'
+
+  # ... more configuration options as needed ...
+end
+
+Identikey::Provisioning.configure do
+  wsdl     './path/to/your/provisioning.wsdl'
   endpoint 'https://your-identikey.example.com:8888'
 
   # ... more configuration options as needed ...
@@ -90,7 +140,7 @@ By default, sensitive values attribute are filtered out from the logs.
 Other attributes to filter out can be specified by prefixing them with
 `identikey:`.
 
-Example, filter out `CREDFLD_PASSWORD` and `CREDFLD_USERID`:
+Example, filter out `CREDFLD\_PASSWORD` and `CREDFLD\_USERID`:
 
 ```ruby
 Identikey::Authentication.configure do
@@ -100,9 +150,9 @@ end
 
 Please note that the following attributes are filtered out by default:
 
-* `CREDFLD_PASSWORD`
-* `CREDFLD_STATIC_PASSWORD`
-* `CREDFLD_SESSION_ID`
+* `CREDFLD\_PASSWORD`
+* `CREDFLD\_STATIC\_PASSWORD`
+* `CREDFLD\_SESSION\_ID`
 
 Please note that if you set your custom filters, these will override the
 defaults and you should also take care of filtering the above parameters
