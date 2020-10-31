@@ -60,9 +60,12 @@ module Identikey
     ## message through which a CRONTO image can be generated, to be
     ## used for push notifications setups in combination with a MDC
     ## configured on your OneSpan control panel and on Identikey.
+    ##
+    ## You may want to look into https://github.com/ifad/cronto for
+    ## a generator to produce PNGs to deliver to your clients.
     ####
-    def dsapp_srp_cronto_push(gateway:, **kwargs)
-      status, result, error = self.dsapp_srp_register(**kwargs)
+    def self.cronto_code_for_srp_registration(gateway:, **kwargs)
+      status, result, error = new.dsapp_srp_register(**kwargs)
 
       if status != 'STAT_SUCCESS'
         raise Identikey::OperationFailed, "Error while assigning DAL: #{status} - #{[error].flatten.join('; ')}"
