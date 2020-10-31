@@ -32,7 +32,7 @@ SOAP APIs.
 
 ### Authentication
 
-* `auth\_user`: end user authentication with OTP / static password / back-end
+* `auth_user`: end user authentication with OTP / static password / back-end
 
 
 ### Administration
@@ -46,23 +46,23 @@ SOAP APIs.
 * `alive?`: checks whether an administrative session is alive. You can use
   `.logon` again when `.alive?` returns `false`.
 
-* `admin\_session\_query`: returns active admin sessions
+* `admin_session_query`: returns active admin sessions
 
-* `user\_execute`: `view`, `create`, `update`, `delete`, `reset\_password`,
-  `set\_password`, and `unlock` user accounts.
+* `user_execute`: `view`, `create`, `update`, `delete`, `reset_password`,
+  `set_password`, and `unlock` user accounts.
 
-* `user\_query`: search for users
+* `user_query`: search for users
 
-* `digipass\_execute`: `view`, `assign`, `unassign` digipasses
+* `digipass_execute`: `view`, `assign`, `unassign` digipasses
 
-* `digipass\_query`: search for digipasses
+* `digipass_query`: search for digipasses
 
-* `digipassappl\_execute`: `test\_otp`, `set\_pin` on applicable digipasses
+* `digipassappl_execute`: `test_otp`, `set_pin` on applicable digipasses
 
 
 ### Provisioning
 
-* `provisioning\_execute`: `mdl\_register`, `dsapp\_srp\_register`. bonus:
+* `provisioning_execute`: `mdl_register`, `dsapp_srp_register`. bonus:
   generation of CRONTO images for online activation, for use with the push
   notification gateways. You can use [this gem](https://github.com/ifad/cronto)
   to generate the PNG to serve to your users.
@@ -140,7 +140,7 @@ By default, sensitive values attribute are filtered out from the logs.
 Other attributes to filter out can be specified by prefixing them with
 `identikey:`.
 
-Example, filter out `CREDFLD\_PASSWORD` and `CREDFLD\_USERID`:
+Example, filter out `CREDFLD_PASSWORD` and `CREDFLD_USERID`:
 
 ```ruby
 Identikey::Authentication.configure do
@@ -150,9 +150,9 @@ end
 
 Please note that the following attributes are filtered out by default:
 
-* `CREDFLD\_PASSWORD`
-* `CREDFLD\_STATIC\_PASSWORD`
-* `CREDFLD\_SESSION\_ID`
+* `CREDFLD_PASSWORD`
+* `CREDFLD_STATIC_PASSWORD`
+* `CREDFLD_SESSION_ID`
 
 Please note that if you set your custom filters, these will override the
 defaults and you should also take care of filtering the above parameters
