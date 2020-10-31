@@ -77,8 +77,6 @@ module Identikey
         gateway
       ]
 
-      puts message
-
       # Encode it as hex
       return message.split(//).map {|c| '%x' % c.ord}.join
     end
