@@ -82,6 +82,7 @@ module Identikey
 
       filters: [
         'sessionID',
+        'staticPassword',
         'identikey:CREDFLD_PASSWORD',
         'identikey:CREDFLD_STATIC_PASSWORD',
         'identikey:CREDFLD_SESSION_ID'
