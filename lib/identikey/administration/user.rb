@@ -161,6 +161,22 @@ module Identikey
         true
       end
 
+      def set_phone!(phone)
+        ensure_persisted!
+
+        stat, _, error = @session.execute(
+          :user_execute_UPDATE,  attributes: { USERFLD_USERID: username,
+            USERFLD_DOMAIN: domain,
+            USERFLD_PHONE: phone })
+
+        if stat != 'STAT_SUCCESS'
+          raise Identikey::OperationFailed, "Set user #{self.username} phone failed: #{stat} - #{error}"
+        end
+
+        true
+      end
+
+
       def set_local_auth!(value)
         ensure_persisted!
 
