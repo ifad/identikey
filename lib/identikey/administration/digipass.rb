@@ -2,6 +2,8 @@ module Identikey
   class Administration < Base
 
     class Digipass
+      attr_reader :attributes
+
       def self.find(session:, serial_no:)
         new(session).find(serial_no)
       end
@@ -90,7 +92,7 @@ module Identikey
           :digipass_execute_UNASSIGN, serial_no: self.serial)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::OperationFailed, "Assign digipass failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Unassign digipass failed: #{stat} - #{error}"
         end
 
         replace(digipass)
@@ -101,7 +103,7 @@ module Identikey
           :digipass_execute_ASSIGN, serial_no: self.serial, username: username, domain: domain)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::OperationFailed, "Unassign digipass failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Assign digipass failed: #{stat} - #{error}"
         end
 
         replace(digipass)
