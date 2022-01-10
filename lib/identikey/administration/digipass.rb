@@ -50,6 +50,7 @@ module Identikey
           domain:             digipass['DIGIPASSFLD_DOMAIN'],
           ou:                 digipass['DIGIPASSFLD_ORGANIZATIONAL_UNIT'],
           type:               digipass['DIGIPASSFLD_DPTYPE'],
+          device_type:        digipass['DIGIPASSFLD_DEVICE_TYPE'],
           application:        digipass['DIGIPASSFLD_ACTIVE_APPL_NAMES'],
           status:             digipass['DIGIPASSFLD_ASSIGN_STATUS'],
           userid:             digipass['DIGIPASSFLD_ASSIGNED_USERID'],
