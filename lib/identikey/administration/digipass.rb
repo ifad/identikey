@@ -2,6 +2,8 @@ module Identikey
   class Administration < Base
 
     class Digipass
+      attr_reader :attributes
+
       def self.find(session:, serial_no:)
         new(session).find(serial_no)
       end
@@ -48,6 +50,7 @@ module Identikey
           domain:             digipass['DIGIPASSFLD_DOMAIN'],
           ou:                 digipass['DIGIPASSFLD_ORGANIZATIONAL_UNIT'],
           type:               digipass['DIGIPASSFLD_DPTYPE'],
+          device_type:        digipass['DIGIPASSFLD_DEVICE_TYPE'],
           application:        digipass['DIGIPASSFLD_ACTIVE_APPL_NAMES'],
           status:             digipass['DIGIPASSFLD_ASSIGN_STATUS'],
           userid:             digipass['DIGIPASSFLD_ASSIGNED_USERID'],
@@ -59,6 +62,7 @@ module Identikey
           last_activation_at: digipass['DIGIPASSFLD_LAST_ACTIV_TIME'],
           bind_status:        digipass['DIGIPASSFLD_BIND_STATUS'],
           max_activations:    digipass['DIGIPASSFLD_MAX_ACTIVATIONS'],
+          expires_at:         digipass['DIGIPASSFLD_EXPIRATION_TIME'],
           expired:            digipass['DIGIPASSFLD_EXPIRED'],
           grace_expired:      digipass['DIGIPASSFLD_GRACE_PERIOD_EXPIRED']
         }.freeze
@@ -90,18 +94,18 @@ module Identikey
           :digipass_execute_UNASSIGN, serial_no: self.serial)
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::OperationFailed, "Assign digipass failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Unassign digipass failed: #{stat} - #{error}"
         end
 
         replace(digipass)
       end
 
-      def assign!(username, domain)
+      def assign!(username, domain, opt = {})
         stat, digipass, error = @session.execute(
-          :digipass_execute_ASSIGN, serial_no: self.serial, username: username, domain: domain)
+          :digipass_execute_ASSIGN, serial_no: self.serial, username: username, domain: domain, expires_at: opt[:expires_at])
 
         if stat != 'STAT_SUCCESS'
-          raise Identikey::OperationFailed, "Unassign digipass failed: #{stat} - #{error}"
+          raise Identikey::OperationFailed, "Assign digipass failed: #{stat} - #{error}"
         end
 
         replace(digipass)
