@@ -62,6 +62,7 @@ module Identikey
           last_activation_at: digipass['DIGIPASSFLD_LAST_ACTIV_TIME'],
           bind_status:        digipass['DIGIPASSFLD_BIND_STATUS'],
           max_activations:    digipass['DIGIPASSFLD_MAX_ACTIVATIONS'],
+          expires_at:         digipass['DIGIPASSFLD_EXPIRATION_TIME'],
           expired:            digipass['DIGIPASSFLD_EXPIRED'],
           grace_expired:      digipass['DIGIPASSFLD_GRACE_PERIOD_EXPIRED']
         }.freeze
