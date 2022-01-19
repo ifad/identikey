@@ -100,9 +100,9 @@ module Identikey
         replace(digipass)
       end
 
-      def assign!(username, domain)
+      def assign!(username, domain, opt = {})
         stat, digipass, error = @session.execute(
-          :digipass_execute_ASSIGN, serial_no: self.serial, username: username, domain: domain)
+          :digipass_execute_ASSIGN, serial_no: self.serial, username: username, domain: domain, expires_at: opt[:expires_at])
 
         if stat != 'STAT_SUCCESS'
           raise Identikey::OperationFailed, "Assign digipass failed: #{stat} - #{error}"

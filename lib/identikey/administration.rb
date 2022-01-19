@@ -247,7 +247,7 @@ module Identikey
       )
     end
 
-    def digipass_execute_ASSIGN(session_id:, serial_no:, username:, domain:, grace_period: 0)
+    def digipass_execute_ASSIGN(session_id:, serial_no:, username:, domain:, grace_period: 0, expires_at: nil)
       digipass_execute(
         session_id: session_id,
         cmd: 'DIGIPASSCMD_ASSIGN',
@@ -255,7 +255,9 @@ module Identikey
           DIGIPASSFLD_SERNO: serial_no,
           DIGIPASSFLD_ASSIGNED_USERID: username,
           DIGIPASSFLD_DOMAIN: domain,
-          DIGIPASSFLD_GRACE_PERIOD_DAYS: grace_period
+          DIGIPASSFLD_GRACE_PERIOD_DAYS: grace_period,
+          DIGIPASSFLD_EXPIRATION_TIME: expires_at
+
         )
       )
     end
